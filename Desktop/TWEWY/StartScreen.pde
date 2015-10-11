@@ -7,10 +7,11 @@ class StartScreen {
   
   Minim minim;  // The main audio controller.
   AudioPlayer welcomePlayer;
+  AudioPlayer scratchPlayer;
+  AudioPlayer selectPlayer;
   
   boolean fadeIn;
   boolean hasPressedStart;
-  boolean isHoveringOverStart;
   
   StartScreen(Minim minim) {
     bottomStartImage = loadImage("TWEWY_Start_Screen_bottom.jpg");
@@ -22,9 +23,11 @@ class StartScreen {
     welcomePlayer = minim.loadFile("Wonderful.mp3");
     welcomePlayer.loop();
     
+    scratchPlayer = minim.loadFile("startScratch.wav");
+    selectPlayer = minim.loadFile("startSelect.wav");
+        
     fadeIn = false;
     hasPressedStart = false;
-    isHoveringOverStart = false;
   }
   
   void display() {
@@ -32,6 +35,7 @@ class StartScreen {
     topScreenShimmer();
     bottomScreenShimmer();
     updateShimmerEffect();
+    updateStartStatus();
   }
   
   void topScreenShimmer() {
@@ -55,16 +59,17 @@ class StartScreen {
     transparency = fadeIn ? transparency - 5 : transparency + 2.5; 
   }
   
-//  boolean hasPressedStart() {
-//    return hasPressedStart;
-//  }
-//  
-//  boolean isHoveringOverStart() {
-//    
-//  }
+  void updateStartStatus() {
+    if (mousePressed && (hasPressedStart == false)) {
+      hasPressedStart = dist(70, 420, mouseX, mouseY) <= 50;
+    } 
+  }
   
-  void mouseClicked() {
-
+  void playStartSound() {
+    welcomePlayer.shiftGain(welcomePlayer.getGain(), -80, 5000);
+    selectPlayer.play();
+    scratchPlayer.play();
   }
   
 }
+
