@@ -66,7 +66,7 @@ class StartScreen {
   }
   
   void playStartSound() {
-    welcomePlayer.shiftGain(welcomePlayer.getGain(), -80, 5000);
+    welcomePlayer.shiftGain(welcomePlayer.getGain(), -70, 6000);
     selectPlayer.play();
     scratchPlayer.play();
   }
