@@ -1,8 +1,11 @@
 import ddf.minim.*;
 
 ScreenSeparator screenSeparator;
+
 StartScreen startScreen;
 Transition transition;
+Shibuya shibuya;
+
 Minim minim;
 
 int state;
@@ -19,6 +22,7 @@ void setup() {
   screenSeparator = new ScreenSeparator();
   startScreen = new StartScreen(minim);
   transition = new Transition();
+  shibuya = new Shibuya(minim);
   
   state = START_STATE;
 }
@@ -32,6 +36,8 @@ void draw() {
     state = TRANSITION_STATE;
   } else if ((state == TRANSITION_STATE) && (transition.isFinishedDisplaying())) {
      state = SCRAMBLE_CROSSING_STATE;
+     tint(255);
+     shibuya.playAudio();
   }
   
   // States displaying.
@@ -43,7 +49,7 @@ void draw() {
   } else if (state == TRANSITION_STATE) {
     transition.display();
   } else if (state == SCRAMBLE_CROSSING_STATE) {
-    // Display shibuya
+    shibuya.display();
   }
   
   screenSeparator.display();
