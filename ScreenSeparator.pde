@@ -9,7 +9,7 @@ class ScreenSeparator {
   static final int CENTER_Y_TOP = 700 * 1/4;
 
  void display() {
-   fill(255);
+   fill(0);
    noStroke();
    rectMode(CENTER);
    rect(5, height/2, 10, height);  // Left edge
@@ -17,6 +17,9 @@ class ScreenSeparator {
    rect(width/2, height/2, width, 20);  // Middle bridge
    rect(width/2, 5, width, 10);  // Top edge
    rect(width/2, height - 5, width, 10);  // Bottom edge
+   
+   fill(84, 84, 84);
+   ellipse(width/2, height/2, 5, 15);  // Mic
  }
   
 }
