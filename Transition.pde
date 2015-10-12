@@ -1,7 +1,7 @@
 class Transition {
   PImage bottomTransitionImage;
   PImage topTransitionImage;
-  int transparency;
+  float transparency;
   int transparencyVelocity;
   int zeroCount;
 
@@ -38,7 +38,7 @@ class Transition {
   
   void updateTransitionEffect() {
     
-    transparency += (transparencyVelocity == DECREASING) ? -1 : 2;
+    transparency += (transparencyVelocity == DECREASING) ? -1 : 1.3;
     if (transparency >= 255) {
       if (zeroCount < TRANSITION_STILL_FRAMES) {  // Freeze the transition image when it is no longer transparent.
          zeroCount++;
