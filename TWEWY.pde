@@ -5,6 +5,7 @@ ScreenSeparator screenSeparator;
 StartScreen startScreen;
 Transition transition;
 Shibuya shibuya;
+Neku neku;
 
 Minim minim;
 
@@ -23,13 +24,13 @@ void setup() {
   startScreen = new StartScreen(minim);
   transition = new Transition();
   shibuya = new Shibuya(minim);
+  neku = new Neku();
   
   state = START_STATE;
 }
 
 void draw() {  
-  
-  // State updating.
+  // Update the game's status.
   if ((state == START_STATE) && (startScreen.hasPressedStart)) {
     startScreen.display();
     startScreen.playStartSound();
@@ -40,17 +41,22 @@ void draw() {
      shibuya.playAudio();
   }
   
-  // States displaying.
+  // Display the correct state.
   if (state == START_STATE) {
     startScreen.display();
-    fill(255, 175);
-    noCursor();
-    ellipse(mouseX, mouseY, 10, 10);
   } else if (state == TRANSITION_STATE) {
     transition.display();
   } else if (state == SCRAMBLE_CROSSING_STATE) {
     shibuya.display();
+    neku.display();
   }
   
+  displayStylus();
   screenSeparator.display();
+}
+
+void displayStylus() {
+    fill(255, 175);
+    noCursor();
+    ellipse(mouseX, mouseY, 10, 10); 
 }
