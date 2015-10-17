@@ -17,9 +17,9 @@ class Shibuya {
   private final int FADE_IN_TARGET_COUNT = 256;
   
  Shibuya(Minim minim) {
-//    scrambleCrossingBottom = loadImage();
     imageMode(CENTER);
     scrambleCrossingTop = loadImage("scramble_crossing_top.png");
+    scrambleCrossingBottom = loadImage("Scramble_Background_Bottom.jpg");
     
     backgroundMusic = minim.loadFile("underground.mp3");
     
@@ -27,16 +27,33 @@ class Shibuya {
  }
  
  void display() {
+   displayBottomScreen();
    displayTopScreen();
  }
  
  void displayTopScreen() {
+   imageMode(CENTER);  // Required for the following, alternate version of drawing (a subsection of) the image.
    if (fadeInCounter < FADE_IN_TARGET_COUNT) {
      tint(255, fadeInCounter);
      fadeInCounter += 0.2;
    }
    image(scrambleCrossingTop, ScreenSeparator.CENTER_X_TOP, ScreenSeparator.CENTER_Y_TOP);
  }
+ 
+  void displayBottomScreen() {
+    imageMode(CENTER);
+    int imgCenterX = scrambleCrossingBottom.width/2;
+    int imgCenterY = scrambleCrossingBottom.height/2;
+    image(
+        scrambleCrossingBottom.get(
+            imgCenterX - ScreenSeparator.SCREEN_WIDTH/2, 
+            imgCenterY - ScreenSeparator.SCREEN_HEIGHT/2, 
+            ScreenSeparator.SCREEN_WIDTH, 
+            ScreenSeparator.SCREEN_HEIGHT
+        ), 
+        ScreenSeparator.CENTER_X_BOTTOM, 
+        ScreenSeparator.CENTER_Y_BOTTOM);
+  }
  
  void updateSetting(int location, int state) {
    
@@ -45,7 +62,7 @@ class Shibuya {
  void playAudio() {
    backgroundMusic.loop(); 
    backgroundMusic.setGain(-30);
-   backgroundMusic.shiftGain(backgroundMusic.getGain(), -5, 5000);
+   backgroundMusic.shiftGain(backgroundMusic.getGain(), -15, 4000);
  }
   
 }
