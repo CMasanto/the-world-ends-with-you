@@ -5,6 +5,7 @@ ScreenSeparator screenSeparator;
 StartScreen startScreen;
 Transition transition;
 Shibuya shibuya;
+SkullPin skullPin;
 Neku neku;
 
 Minim minim;
@@ -12,19 +13,19 @@ Minim minim;
 int state;
 final int START_STATE = 1;
 final int TRANSITION_STATE = 2;
-final int SCRAMBLE_CROSSING_STATE = 3;
-final int A_EAST_STATE = 4;
+final int SCRAMBLE_STATE = 3;
 final int BATTLE_STATE = 5;
 
 void setup() {
   size(458, 700); 
-  frameRate(50);
+  frameRate(60);
   minim = new Minim(this);
   
   screenSeparator = new ScreenSeparator();
   startScreen = new StartScreen(minim);
   transition = new Transition();
   shibuya = new Shibuya(minim);
+  skullPin = new SkullPin();
   neku = new Neku();
   
   state = START_STATE;
@@ -37,7 +38,7 @@ void draw() {
     startScreen.playStartSound();
     state = TRANSITION_STATE;
   } else if ((state == TRANSITION_STATE) && (transition.isFinishedDisplaying())) {
-     state = SCRAMBLE_CROSSING_STATE;
+     state = SCRAMBLE_STATE;
      tint(255);
      shibuya.playAudio();
   }
@@ -47,10 +48,11 @@ void draw() {
     startScreen.display();
   } else if (state == TRANSITION_STATE) {
     transition.display();
-  } else if (state == SCRAMBLE_CROSSING_STATE) {
+  } else if (state == SCRAMBLE_STATE) {
     shibuya.display();
     neku.move();
     neku.display();
+    skullPin.display();
   }
   
   displayStylus();
@@ -59,6 +61,7 @@ void draw() {
 
 void displayStylus() {
     fill(255, 175);
+    noStroke();
     noCursor();
     ellipse(mouseX, mouseY, 10, 10); 
 }
@@ -110,5 +113,17 @@ void keyReleased() {
         neku.keyIsPressed[neku.dRIGHT] = false;
         break;
     }  
+  }
+}
+
+void mousePressed() {
+  println("mouse pressed");
+  if (state == SCRAMBLE_STATE) {
+    if (dist(mouseX, mouseY, skullPin.X_POS, skullPin.Y_POS) <= skullPin.PIN_RADIUS) {
+      skullPin.isActivated = !skullPin.isActivated;
+      if (!skullPin.isActivated) { 
+        skullPin.activationFieldRadius = skullPin.INITIAL_FIELD_RADIUS;
+      }
+    }
   }
 }
