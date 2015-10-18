@@ -41,10 +41,10 @@ class Neku {
   final int dUP_LEFT = 7;
 
   final int NUM_SPRITES_IN_ONE_STEP = 8;  // The number of sprites in each PImage sprite array.
-  final float VERTICAL_STEP_LENGTH = 4;
-  final float HORIZONTAL_STEP_LENGTH = 8;
-  final float DIAGONAL_STEP_LENGTH_X = 3;
-  final float DIAGONAL_STEP_LENGTH_Y = 3; 
+  final float VERTICAL_STEP_LENGTH = 5;
+  final float HORIZONTAL_STEP_LENGTH = 7;
+  final float DIAGONAL_STEP_LENGTH_X = 7;
+  final float DIAGONAL_STEP_LENGTH_Y = 7; 
 
   Neku() {
     leftRunSprites = new PImage[]{
@@ -156,7 +156,8 @@ class Neku {
     keyIsPressed = new boolean[]{ false, false, false, false };
   }
   
-  void display() {
+  void display() {    
+    drawShadow();
     image(activeSprite, xPos, yPos);
   }
   
@@ -165,10 +166,12 @@ class Neku {
       println("up");
       direction = dUP;
       goUp();
+      updateSpriteSize();
     } else if (keyIsPressed[dDOWN] && !keyIsPressed[dLEFT] && !keyIsPressed[dRIGHT]) {
       println("down");
       direction = dDOWN;
       goDown();
+      updateSpriteSize();
     } else if (keyIsPressed[dLEFT] && !keyIsPressed[dUP] && !keyIsPressed[dDOWN]) {
       println("left");
       direction = dLEFT;
@@ -181,29 +184,34 @@ class Neku {
       println("up left");
       direction = dUP_LEFT;
       goUpLeft();
+      updateSpriteSize();
     } else if (keyIsPressed[dUP] && keyIsPressed[dRIGHT]) {
       println("up right");
       direction = dUP_RIGHT;
       goUpRight();
+      updateSpriteSize();
     } else if (keyIsPressed[dDOWN] && keyIsPressed[dLEFT]) {
       println("down left");
       direction = dDOWN_LEFT;
       goDownLeft();
+      updateSpriteSize();
     } else if (keyIsPressed[dDOWN] && keyIsPressed[dRIGHT]) {
       println("down right");
       direction = dDOWN_RIGHT;
       goDownRight();
+      updateSpriteSize();
     } else {
       final int sIndex = spriteIndex % NUM_SPRITES_IN_ONE_STEP;
       final boolean currentSpriteIndexSmoothlyTransitionsIntoStandingPosition = 
           direction == dDOWN_LEFT || direction == dDOWN_RIGHT ? (sIndex == 0 || sIndex == 6) : (sIndex == 1 || sIndex == 5);
       if (!currentSpriteIndexSmoothlyTransitionsIntoStandingPosition) {
         moveForStanding();
+        updateSpriteSize();
       } else {
         println("standing");
         stand(); 
       }
-    }
+    }    
   }
   
   void goLeft() {
@@ -219,11 +227,13 @@ class Neku {
   void goUp() {
     activeSprite = upRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
     yPos -= VERTICAL_STEP_LENGTH;
+    scale *= 0.97;
   }
   
   void goDown() {
     activeSprite = downRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
     yPos += VERTICAL_STEP_LENGTH;
+    scale /= 0.97;
   }
   
   void goDownLeft() {
@@ -321,5 +331,46 @@ class Neku {
         goDownLeft();
         break;    
     }   
+  }
+  
+  void drawShadow() {
+    ellipseMode(CENTER);
+    noStroke();
+    fill(30,30, 30, 128);
+    ellipse(xPos, yPos + SPRITE_HEIGHT/2, VERTICAL_SPRITE_WIDTH*scale, VERTICAL_SPRITE_WIDTH*scale/2);
+  }
+  
+  void updateSpriteSize() {
+    switch (direction) {
+      case dUP:
+        scale *= 0.995;
+        activeSprite.resize((int)(VERTICAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+        break;
+        
+      case dDOWN:
+        scale /= 0.995;
+        activeSprite.resize((int)(VERTICAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+        break;
+        
+      case dUP_RIGHT:
+        scale *= 0.995;
+        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+        break;
+        
+      case dDOWN_RIGHT:
+        scale /= 0.995;
+        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+        break;
+        
+      case dDOWN_LEFT:
+        scale /= 0.995;
+        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+        break;
+        
+      case dUP_LEFT:
+        scale *= 0.995;
+        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+        break;
+    }
   }
 }
