@@ -1,14 +1,17 @@
 class Neku {
   PImage activeSprite;
+  
+  int spriteIndex;  // Tracks the index of the active sprite within its PImage array.
   int xPos;
   int yPos;
-  int scale;
+  float scale;
+  int direction;
+  boolean[] keyIsPressed;
   
   PImage[] leftRunSprites;
   PImage[] rightRunSprites;
   PImage[] upRunSprites;
   PImage[] downRunSprites;
-  
   PImage[] upLeftRunSprites;
   PImage[] upRightRunSprites;
   PImage[] downLeftRunSprites;
@@ -27,6 +30,21 @@ class Neku {
   final int DIAGONAL_SPRITE_WIDTH = 48;  // The width of Neku sprites moving diagonally.
   final int HORIZONTAL_SPRITE_WIDTH = 56;  // The width of Neku sprites moving horizontally.
   final int VERTICAL_SPRITE_WIDTH = 25;  // The width of Neku sprites moving vertically.
+  
+  final int dUP = 0;
+  final int dDOWN = 1;
+  final int dLEFT = 2;
+  final int dRIGHT = 3;
+  final int dUP_RIGHT = 4;
+  final int dDOWN_RIGHT = 5;
+  final int dDOWN_LEFT = 6;
+  final int dUP_LEFT = 7;
+
+  final int NUM_SPRITES_IN_ONE_STEP = 8;  // The number of sprites in each PImage sprite array.
+  final float VERTICAL_STEP_LENGTH = 4;
+  final float HORIZONTAL_STEP_LENGTH = 8;
+  final float DIAGONAL_STEP_LENGTH_X = 3;
+  final float DIAGONAL_STEP_LENGTH_Y = 3; 
 
   Neku() {
     leftRunSprites = new PImage[]{
@@ -127,13 +145,181 @@ class Neku {
     downRightStandSprite = loadImage("Neku_Stand_Down_Right.png");
     
     activeSprite = downStandSprite;
+    spriteIndex = 0;
+    
+    // Set Neku at the very bottom of the player's screen, and at normal size (i.e., scale), looking ahead.
     xPos = ScreenSeparator.CENTER_X_BOTTOM;
     yPos = ScreenSeparator.CENTER_Y_BOTTOM + (ScreenSeparator.SCREEN_HEIGHT)/2 - SPRITE_HEIGHT;
+    direction = dDOWN;
     scale = 1;
+    
+    keyIsPressed = new boolean[]{ false, false, false, false };
   }
   
   void display() {
     image(activeSprite, xPos, yPos);
   }
-
+  
+  void move() {
+    if (keyIsPressed[dUP] && !keyIsPressed[dLEFT] && !keyIsPressed[dRIGHT]) {
+      println("up");
+      direction = dUP;
+      goUp();
+    } else if (keyIsPressed[dDOWN] && !keyIsPressed[dLEFT] && !keyIsPressed[dRIGHT]) {
+      println("down");
+      direction = dDOWN;
+      goDown();
+    } else if (keyIsPressed[dLEFT] && !keyIsPressed[dUP] && !keyIsPressed[dDOWN]) {
+      println("left");
+      direction = dLEFT;
+      goLeft();
+    } else if (keyIsPressed[dRIGHT] && !keyIsPressed[dUP] && !keyIsPressed[dDOWN]) {
+      println("right");
+      direction = dRIGHT;
+      goRight();
+    } else if (keyIsPressed[dUP] && keyIsPressed[dLEFT]) {
+      println("up left");
+      direction = dUP_LEFT;
+      goUpLeft();
+    } else if (keyIsPressed[dUP] && keyIsPressed[dRIGHT]) {
+      println("up right");
+      direction = dUP_RIGHT;
+      goUpRight();
+    } else if (keyIsPressed[dDOWN] && keyIsPressed[dLEFT]) {
+      println("down left");
+      direction = dDOWN_LEFT;
+      goDownLeft();
+    } else if (keyIsPressed[dDOWN] && keyIsPressed[dRIGHT]) {
+      println("down right");
+      direction = dDOWN_RIGHT;
+      goDownRight();
+    } else {
+      final int sIndex = spriteIndex % NUM_SPRITES_IN_ONE_STEP;
+      final boolean currentSpriteIndexSmoothlyTransitionsIntoStandingPosition = 
+          direction == dDOWN_LEFT || direction == dDOWN_RIGHT ? (sIndex == 0 || sIndex == 6) : (sIndex == 1 || sIndex == 5);
+      if (!currentSpriteIndexSmoothlyTransitionsIntoStandingPosition) {
+        moveForStanding();
+      } else {
+        println("standing");
+        stand(); 
+      }
+    }
+  }
+  
+  void goLeft() {
+    activeSprite = leftRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
+    xPos -= HORIZONTAL_STEP_LENGTH;
+  }
+  
+  void goRight() {
+    activeSprite = rightRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
+    xPos += HORIZONTAL_STEP_LENGTH;
+  }
+  
+  void goUp() {
+    activeSprite = upRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
+    yPos -= VERTICAL_STEP_LENGTH;
+  }
+  
+  void goDown() {
+    activeSprite = downRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
+    yPos += VERTICAL_STEP_LENGTH;
+  }
+  
+  void goDownLeft() {
+    activeSprite = downLeftRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
+    xPos -= HORIZONTAL_STEP_LENGTH;
+    yPos += VERTICAL_STEP_LENGTH;
+  }
+  
+  void goDownRight() {
+    activeSprite = downRightRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
+    xPos += HORIZONTAL_STEP_LENGTH;
+    yPos += VERTICAL_STEP_LENGTH;  
+  }
+  
+  void goUpLeft() {
+    activeSprite = upLeftRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
+    xPos -= HORIZONTAL_STEP_LENGTH;
+    yPos -= VERTICAL_STEP_LENGTH;  
+  }
+  
+  void goUpRight() {
+    activeSprite = upRightRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
+    xPos += HORIZONTAL_STEP_LENGTH;
+    yPos -= VERTICAL_STEP_LENGTH;  
+  }
+  
+  void stand() {
+    switch (direction) {
+      case dUP:
+        activeSprite = upStandSprite;
+        break;
+        
+      case dDOWN:
+        activeSprite = downStandSprite;
+        break;
+        
+      case dLEFT:
+        activeSprite = leftStandSprite;
+        break;
+        
+      case dRIGHT:
+        activeSprite = rightStandSprite;
+        break;
+        
+      case dUP_RIGHT:
+        activeSprite = upRightStandSprite;
+        break;
+        
+      case dUP_LEFT:
+        activeSprite = upLeftStandSprite;
+        break;      
+        
+      case dDOWN_RIGHT:
+        activeSprite = downRightStandSprite;
+        break;      
+        
+      case dDOWN_LEFT:
+        activeSprite = downLeftStandSprite;
+        break;    
+      }
+  }
+  
+  void moveForStanding() {
+    println("moving to stand");
+    switch (direction) {
+      case dUP:
+        goUp();
+        break;
+        
+      case dDOWN:
+        goDown();
+        break;
+        
+      case dLEFT:
+        goLeft();
+        break;
+        
+      case dRIGHT:
+        goRight();
+        break;
+        
+      case dUP_RIGHT:
+        goUpRight();
+        break;
+        
+      case dUP_LEFT:
+        goUpLeft();
+        break;      
+        
+      case dDOWN_RIGHT:
+        goDownRight();
+        break;      
+        
+      case dDOWN_LEFT:
+        goDownLeft();
+        break;    
+    }   
+  }
 }
