@@ -35,7 +35,7 @@ class Shibuya {
    imageMode(CENTER);  // Required for the following, alternate version of drawing (a subsection of) the image.
    if (fadeInCounter < FADE_IN_TARGET_COUNT) {
      tint(255, fadeInCounter);
-     fadeInCounter += 0.2;
+     fadeInCounter ++;
    }
    image(scrambleCrossingTop, ScreenSeparator.CENTER_X_TOP, ScreenSeparator.CENTER_Y_TOP);
  }
@@ -55,7 +55,19 @@ class Shibuya {
         ScreenSeparator.CENTER_Y_BOTTOM);
   }
  
- void updateSetting(int location, int state) {
+ void playerCanWalkLeft(Neku neku) {
+   
+ }
+ 
+ void playerCanWalkRight(Neku neku) {
+   
+ }
+ 
+ void playerCanWalkUp(Neku neku) {
+   
+ }
+ 
+ void playerCanWalkDown(Neku neku) {
    
  }
  
