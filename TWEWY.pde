@@ -18,6 +18,7 @@ final int BATTLE_STATE = 5;
 
 void setup() {
   size(458, 700); 
+  frameRate(50);
   minim = new Minim(this);
   
   screenSeparator = new ScreenSeparator();
@@ -48,6 +49,7 @@ void draw() {
     transition.display();
   } else if (state == SCRAMBLE_CROSSING_STATE) {
     shibuya.display();
+    neku.move();
     neku.display();
   }
   
@@ -59,4 +61,54 @@ void displayStylus() {
     fill(255, 175);
     noCursor();
     ellipse(mouseX, mouseY, 10, 10); 
+}
+
+void keyPressed() {
+  println("key pressed");
+  if (key == CODED) {
+    switch (keyCode) {
+      case UP: 
+        neku.keyIsPressed[neku.dUP] = true;
+        break;
+      
+      case DOWN: 
+        neku.keyIsPressed[neku.dDOWN] = true;
+        break;
+      
+      case LEFT:
+        neku.keyIsPressed[neku.dLEFT] = true;
+        break;
+        
+      case RIGHT:
+        neku.keyIsPressed[neku.dRIGHT] = true;
+        break;
+    }
+  }
+}
+
+void keyReleased() {
+  println("key released");
+  if (key == CODED) {
+    switch (keyCode) {
+      case UP: 
+        println("released up");
+        neku.keyIsPressed[neku.dUP] = false;
+        break;
+      
+      case DOWN: 
+        println("released down");
+        neku.keyIsPressed[neku.dDOWN] = false;
+        break;
+      
+      case LEFT:
+        println("released left");
+        neku.keyIsPressed[neku.dLEFT] = false;
+        break;
+        
+      case RIGHT:
+        println("released right");
+        neku.keyIsPressed[neku.dRIGHT] = false;
+        break;
+    }  
+  }
 }
