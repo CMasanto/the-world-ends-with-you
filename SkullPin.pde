@@ -56,12 +56,14 @@ class SkullPin {
       }
     }
     
-    if (activationFieldRadius > height) {  // The field has expanded to all of the screen.
+    if (activationFieldRadius > height && !isReadyForBattle) {  // The field has expanded to all of the screen.
       displayNoiseSymbol();
       displayNoiseShadow();
     }
     imageMode(CENTER);
-    image(skullPinImage, X_POS, Y_POS);
+    if (!isReadyForBattle) {
+      image(skullPinImage, X_POS, Y_POS);
+    }
   }
   
   void drawActivationField() {
@@ -105,7 +107,7 @@ class SkullPin {
   
   void drawBlackTransition() {
     noStroke();
-    fill(TRANSITION_FRAME_LENGTH - blackTransitionFrame++, blackTransitionFrame);
+    fill(0, blackTransitionFrame++);
     rectMode(CENTER);
     rect(width/2, height/2, width, height);
   }
