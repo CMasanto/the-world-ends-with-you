@@ -41,6 +41,8 @@ void draw() {
      state = SCRAMBLE_STATE;
      tint(255);
      shibuya.playAudio();
+  } else if ((state == SCRAMBLE_STATE) && (skullPin.isReadyForBattle)) {
+    state = BATTLE_STATE; 
   }
   
   // Display the correct state.
@@ -122,8 +124,10 @@ void mousePressed() {
     if (dist(mouseX, mouseY, skullPin.X_POS, skullPin.Y_POS) <= skullPin.PIN_RADIUS) {
       skullPin.isActivated = !skullPin.isActivated;
       if (!skullPin.isActivated) { 
-        skullPin.activationFieldRadius = skullPin.INITIAL_FIELD_RADIUS;
+        skullPin.activationFieldRadius = skullPin.INITIAL_FIELD_RADIUS;  // Reset the field radius when deactivated.
       }
+    } else if (skullPin.isActivated && dist(mouseX, mouseY, skullPin.noiseXPos, skullPin.noiseYPos) <= skullPin.NOISE_SYMBOL_RADIUS) {
+      skullPin.isTransitioningToBattle = true;
     }
   }
 }
