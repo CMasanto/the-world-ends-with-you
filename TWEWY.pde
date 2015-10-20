@@ -18,7 +18,7 @@ final int BATTLE_STATE = 5;
 
 void setup() {
   size(458, 700); 
-  frameRate(60);
+//  frameRate(20);
   minim = new Minim(this);
   
   screenSeparator = new ScreenSeparator();
