@@ -2,8 +2,8 @@ class Neku {
   PImage activeSprite;
   
   int spriteIndex;  // Tracks the index of the active sprite within its PImage array.
-  int xPos;
-  int yPos;
+  float xPos;
+  float yPos;
   float scale;
   int direction;
   boolean[] keyIsPressed;
@@ -41,10 +41,10 @@ class Neku {
   final int dUP_LEFT = 7;
 
   final int NUM_SPRITES_IN_ONE_STEP = 8;  // The number of sprites in each PImage sprite array.
-  final float VERTICAL_STEP_LENGTH = 5;
-  final float HORIZONTAL_STEP_LENGTH = 7;
-  final float DIAGONAL_STEP_LENGTH_X = 7;
-  final float DIAGONAL_STEP_LENGTH_Y = 7; 
+  final float VERTICAL_STEP_LENGTH = 7.0;
+  final float HORIZONTAL_STEP_LENGTH = 7.0;
+  final float DIAGONAL_STEP_LENGTH_X = 4.9497474;
+  final float DIAGONAL_STEP_LENGTH_Y = 4.9497474; 
 
   Neku() {
     leftRunSprites = new PImage[]{
@@ -201,7 +201,7 @@ class Neku {
       goDownRight();
       updateSpriteSize();
     } else {
-      final int sIndex = spriteIndex % NUM_SPRITES_IN_ONE_STEP;
+      final int sIndex = (spriteIndex/3) % NUM_SPRITES_IN_ONE_STEP;
       final boolean currentSpriteIndexSmoothlyTransitionsIntoStandingPosition = 
           direction == dDOWN_LEFT || direction == dDOWN_RIGHT ? (sIndex == 0 || sIndex == 6) : (sIndex == 1 || sIndex == 5);
       if (!currentSpriteIndexSmoothlyTransitionsIntoStandingPosition) {
@@ -215,49 +215,49 @@ class Neku {
   }
   
   void goLeft() {
-    activeSprite = leftRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
-    xPos -= HORIZONTAL_STEP_LENGTH;
+    activeSprite = leftRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    xPos = constrain(xPos - HORIZONTAL_STEP_LENGTH, 0, width);
   }
   
   void goRight() {
-    activeSprite = rightRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
-    xPos += HORIZONTAL_STEP_LENGTH;
+    activeSprite = rightRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    xPos = constrain(xPos + HORIZONTAL_STEP_LENGTH, 0, width);
   }
   
   void goUp() {
-    activeSprite = upRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
-    yPos -= VERTICAL_STEP_LENGTH;
+    activeSprite = upRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    yPos = constrain(yPos - VERTICAL_STEP_LENGTH, ScreenSeparator.CENTER_Y_BOTTOM, height);
     scale *= 0.97;
   }
   
   void goDown() {
-    activeSprite = downRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
-    yPos += VERTICAL_STEP_LENGTH;
+    activeSprite = downRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    yPos = constrain(yPos + VERTICAL_STEP_LENGTH, ScreenSeparator.CENTER_Y_BOTTOM, height);
     scale /= 0.97;
   }
   
   void goDownLeft() {
-    activeSprite = downLeftRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
-    xPos -= HORIZONTAL_STEP_LENGTH;
-    yPos += VERTICAL_STEP_LENGTH;
+    activeSprite = downLeftRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    xPos = constrain(xPos - DIAGONAL_STEP_LENGTH_X, 0, width);
+    yPos = constrain(yPos + DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
   }
   
   void goDownRight() {
-    activeSprite = downRightRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
-    xPos += HORIZONTAL_STEP_LENGTH;
-    yPos += VERTICAL_STEP_LENGTH;  
+    activeSprite = downRightRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    xPos = constrain(xPos + DIAGONAL_STEP_LENGTH_X, 0, width);
+    yPos = constrain(yPos + DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
   }
   
   void goUpLeft() {
-    activeSprite = upLeftRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
-    xPos -= HORIZONTAL_STEP_LENGTH;
-    yPos -= VERTICAL_STEP_LENGTH;  
+    activeSprite = upLeftRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    xPos = constrain(xPos - DIAGONAL_STEP_LENGTH_X, 0, width);
+    yPos = constrain(yPos - DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
   }
   
   void goUpRight() {
-    activeSprite = upRightRunSprites[++spriteIndex % NUM_SPRITES_IN_ONE_STEP];
-    xPos += HORIZONTAL_STEP_LENGTH;
-    yPos -= VERTICAL_STEP_LENGTH;  
+    activeSprite = upRightRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    xPos = constrain(xPos + DIAGONAL_STEP_LENGTH_X, 0, width);
+    yPos = constrain(yPos - DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
   }
   
   void stand() {
@@ -343,32 +343,32 @@ class Neku {
   void updateSpriteSize() {
     switch (direction) {
       case dUP:
-        scale *= 0.995;
+        scale = constrain(scale*0.995, 0.7, 1);
         activeSprite.resize((int)(VERTICAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
         break;
         
       case dDOWN:
-        scale /= 0.995;
+        scale = constrain(scale/0.995, 0.7, 1);
         activeSprite.resize((int)(VERTICAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
         break;
         
       case dUP_RIGHT:
-        scale *= 0.995;
+        scale = constrain(scale*0.995, 0.7, 1);
         activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
         break;
         
       case dDOWN_RIGHT:
-        scale /= 0.995;
+        scale = constrain(scale/0.995, 0.7, 1);
         activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
         break;
         
       case dDOWN_LEFT:
-        scale /= 0.995;
+        scale = constrain(scale/0.995, 0.7, 1);
         activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
         break;
         
       case dUP_LEFT:
-        scale *= 0.995;
+        scale = constrain(scale*0.995, 0.7, 1);
         activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
         break;
     }
