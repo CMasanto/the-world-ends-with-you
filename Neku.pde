@@ -52,7 +52,7 @@ class Neku {
   Neku(Minim m) {
     minim = m;
     stepAudio = minim.loadFile("Step.wav");
-    stepAudio.setGain(-20);
+    stepAudio.setGain(-40);
     
     leftRunSprites = new PImage[]{
       loadImage("Neku_Run_Left1.png"),

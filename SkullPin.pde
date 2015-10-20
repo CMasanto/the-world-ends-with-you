@@ -49,6 +49,7 @@ class SkullPin {
     minim = m;
     transitionMusic = minim.loadFile("Despair.mp3");
     focusAudio = minim.loadFile("Focus.mp3");
+    focusAudio.setVolume(2);
     musicIsFading = false;
   } 
 
@@ -135,11 +136,11 @@ class SkullPin {
   }
   
   void fadeInMusic() {
-    transitionMusic.shiftGain(transitionMusic.getGain(), 6, 3000);
+    transitionMusic.shiftGain(transitionMusic.getGain(), 7, 3000);
   }
   
   void fadeOutMusic() {
-    transitionMusic.shiftGain(transitionMusic.getGain(), -12, 4000);
+    transitionMusic.shiftGain(transitionMusic.getGain(), -7, 4000);
   }
 }
 

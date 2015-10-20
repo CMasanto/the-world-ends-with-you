@@ -7,6 +7,7 @@ Transition transition;
 Shibuya shibuya;
 SkullPin skullPin;
 Neku neku;
+Battle battle;
 
 Minim minim;
 
@@ -27,6 +28,7 @@ void setup() {
   skullPin = new SkullPin(minim);
   neku = new Neku(minim);
   shibuya = new Shibuya(minim, neku);
+  battle = new Battle(minim);
   
   state = START_STATE;
 }
@@ -55,6 +57,8 @@ void draw() {
     neku.move();
     neku.display();
     skullPin.display();
+  } else if (state == BATTLE_STATE) {
+    battle.display(); 
   }
   
   displayStylus();
