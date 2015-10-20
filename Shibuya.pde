@@ -4,9 +4,11 @@ class Shibuya {
   private PImage scrambleCrossingBottom;
   private PImage scrambleCrossingTop;
   
-  private AudioPlayer backgroundMusic;
+  AudioPlayer backgroundMusic;
   
   private float fadeInCounter;
+  
+  Neku neku;
   
   final int A_EAST = 2;
   final int CROSSING = 1;
@@ -16,13 +18,14 @@ class Shibuya {
   
   private final int FADE_IN_TARGET_COUNT = 256;
   
- Shibuya(Minim minim) {
+ Shibuya(Minim minim, Neku n) {
     imageMode(CENTER);
     scrambleCrossingTop = loadImage("scramble_crossing_top.png");
     scrambleCrossingBottom = loadImage("Scramble_Background_Bottom.jpg");
     
     backgroundMusic = minim.loadFile("underground.mp3");
     
+    neku = n;
     fadeInCounter = 0;
  }
  
@@ -42,34 +45,16 @@ class Shibuya {
  
   void displayBottomScreen() {
     imageMode(CENTER);
-    int imgCenterX = scrambleCrossingBottom.width/2;
-    int imgCenterY = scrambleCrossingBottom.height/2;
     image(
         scrambleCrossingBottom.get(
-            imgCenterX - ScreenSeparator.SCREEN_WIDTH/2, 
-            imgCenterY - ScreenSeparator.SCREEN_HEIGHT/2, 
+            (int)constrain(neku.xPos, ScreenSeparator.CENTER_X_BOTTOM - ScreenSeparator.SCREEN_WIDTH/2, scrambleCrossingBottom.width - ScreenSeparator.SCREEN_WIDTH), 
+            (int)constrain(neku.yPos, ScreenSeparator.SCREEN_HEIGHT/2, scrambleCrossingBottom.height - ScreenSeparator.SCREEN_HEIGHT), 
             ScreenSeparator.SCREEN_WIDTH, 
             ScreenSeparator.SCREEN_HEIGHT
         ), 
         ScreenSeparator.CENTER_X_BOTTOM, 
         ScreenSeparator.CENTER_Y_BOTTOM);
   }
- 
- void playerCanWalkLeft(Neku neku) {
-   
- }
- 
- void playerCanWalkRight(Neku neku) {
-   
- }
- 
- void playerCanWalkUp(Neku neku) {
-   
- }
- 
- void playerCanWalkDown(Neku neku) {
-   
- }
  
  void playAudio() {
    backgroundMusic.loop(); 
