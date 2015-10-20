@@ -53,10 +53,12 @@ class SkullPin {
           drawBlackTransition();
       } else {
         isReadyForBattle = true;
+        transitionFrame = 0;  // Reset transition frame counter
+        blackTransitionFrame = 0;  // Reset transition frame counter
       }
     }
     
-    if (activationFieldRadius > height && !isReadyForBattle) {  // The field has expanded to all of the screen.
+    if (activationFieldRadius > height && !isReadyForBattle && transitionFrame == 0) {  // The field has expanded to all of the screen.
       displayNoiseSymbol();
       displayNoiseShadow();
     }
