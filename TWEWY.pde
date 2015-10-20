@@ -24,9 +24,9 @@ void setup() {
   screenSeparator = new ScreenSeparator();
   startScreen = new StartScreen(minim);
   transition = new Transition();
-  shibuya = new Shibuya(minim);
-  skullPin = new SkullPin();
-  neku = new Neku();
+  skullPin = new SkullPin(minim);
+  neku = new Neku(minim);
+  shibuya = new Shibuya(minim, neku);
   
   state = START_STATE;
 }
@@ -123,11 +123,20 @@ void mousePressed() {
   if (state == SCRAMBLE_STATE) {
     if (dist(mouseX, mouseY, skullPin.X_POS, skullPin.Y_POS) <= skullPin.PIN_RADIUS) {
       skullPin.isActivated = !skullPin.isActivated;
-      if (!skullPin.isActivated) { 
+      if (!skullPin.isActivated) {
+        skullPin.focusAudio.pause();
+        skullPin.focusAudio.rewind(); // Reset "focus" sound effect when user deactivates pin.
         skullPin.activationFieldRadius = skullPin.INITIAL_FIELD_RADIUS;  // Reset the field radius when deactivated.
+      } else {
+        skullPin.focusAudio.play(); 
       }
     } else if (skullPin.isActivated && dist(mouseX, mouseY, skullPin.noiseXPos, skullPin.noiseYPos) <= skullPin.NOISE_SYMBOL_RADIUS) {
       skullPin.isTransitioningToBattle = true;
+      if (!skullPin.transitionMusic.isPlaying()) {
+        shibuya.backgroundMusic.pause();
+        skullPin.transitionMusic.play();
+        skullPin.fadeInMusic();
+      }
     }
   }
 }

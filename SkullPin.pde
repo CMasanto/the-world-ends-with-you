@@ -13,7 +13,12 @@ class SkullPin {
   float perlinXindex;
   float perlinYindex;
   int transitionFrame;  
-  int blackTransitionFrame;
+  int whiteTransitionFrame;
+  
+  Minim minim;
+  AudioPlayer transitionMusic;
+  AudioPlayer focusAudio;
+  boolean musicIsFading;
   
   final int FIELD_SPEED = 5;
   final int INITIAL_FIELD_RADIUS = 50;
@@ -24,19 +29,27 @@ class SkullPin {
   final int X_POS = ScreenSeparator.CENTER_X_BOTTOM + ScreenSeparator.SCREEN_WIDTH/2 - PIN_RADIUS - 10;
   final int Y_POS = ScreenSeparator.CENTER_Y_BOTTOM + ScreenSeparator.SCREEN_HEIGHT/2 - PIN_RADIUS - 10;
 
-  SkullPin() {
+  SkullPin(Minim m) {
     skullPinImage = loadImage("skullPin.png");
+    
     isActivated = false;
     isReadyForBattle = false;
     isTransitioningToBattle = false;
+    
     activationFieldRadius = INITIAL_FIELD_RADIUS;
     noiseSymbol = loadImage("redNoiseSymbol.png");
     noiseXPos = INITIAL_NOISE_X_POS;
     noiseYPos = INITIAL_NOISE_Y_POS;
     perlinXindex = random(0, 100000);
     perlinYindex = random(0, 100000);
+    
     transitionFrame = 0;
-    blackTransitionFrame = 0;
+    whiteTransitionFrame = 0;
+    
+    minim = m;
+    transitionMusic = minim.loadFile("Despair.mp3");
+    focusAudio = minim.loadFile("Focus.mp3");
+    musicIsFading = false;
   } 
 
   void display() {
@@ -47,14 +60,21 @@ class SkullPin {
       } else if (transitionFrame < TRANSITION_FRAME_LENGTH) {
           drawActivationField();
           drawTransition();
-      } else if (blackTransitionFrame < TRANSITION_FRAME_LENGTH) {
+      } else if (whiteTransitionFrame < TRANSITION_FRAME_LENGTH) {
           drawActivationField();
           drawTransition();
-          drawBlackTransition();
+          drawWhiteTransition();
+          if (!musicIsFading) {
+            musicIsFading = true;
+            fadeOutMusic(); 
+          }
       } else {
         isReadyForBattle = true;
+        transitionMusic.pause();
+        transitionMusic.rewind();  // Reset transition audio
         transitionFrame = 0;  // Reset transition frame counter
-        blackTransitionFrame = 0;  // Reset transition frame counter
+        whiteTransitionFrame = 0;  // Reset transition frame counter
+        musicIsFading = false;  // Reset music flag
       }
     }
     
@@ -107,11 +127,19 @@ class SkullPin {
     rect(width/2, height/2, width, height);
   }
   
-  void drawBlackTransition() {
+  void drawWhiteTransition() {
     noStroke();
-    fill(0, blackTransitionFrame++);
+    fill(255, whiteTransitionFrame++);
     rectMode(CENTER);
     rect(width/2, height/2, width, height);
+  }
+  
+  void fadeInMusic() {
+    transitionMusic.shiftGain(transitionMusic.getGain(), 6, 3000);
+  }
+  
+  void fadeOutMusic() {
+    transitionMusic.shiftGain(transitionMusic.getGain(), -12, 4000);
   }
 }
 

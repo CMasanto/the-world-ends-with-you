@@ -26,6 +26,9 @@ class Neku {
   PImage downLeftStandSprite;
   PImage downRightStandSprite;
   
+  Minim minim;
+  AudioPlayer stepAudio;
+  
   final int SPRITE_HEIGHT = 66;  // The original height of all Neku sprites
   final int DIAGONAL_SPRITE_WIDTH = 48;  // The width of Neku sprites moving diagonally.
   final int HORIZONTAL_SPRITE_WIDTH = 56;  // The width of Neku sprites moving horizontally.
@@ -41,12 +44,16 @@ class Neku {
   final int dUP_LEFT = 7;
 
   final int NUM_SPRITES_IN_ONE_STEP = 8;  // The number of sprites in each PImage sprite array.
-  final float VERTICAL_STEP_LENGTH = 7.0;
-  final float HORIZONTAL_STEP_LENGTH = 7.0;
-  final float DIAGONAL_STEP_LENGTH_X = 4.9497474;
-  final float DIAGONAL_STEP_LENGTH_Y = 4.9497474; 
+  final float VERTICAL_STEP_LENGTH = 4.0;
+  final float HORIZONTAL_STEP_LENGTH = 4.0;
+  final float DIAGONAL_STEP_LENGTH_X = 2.828427;
+  final float DIAGONAL_STEP_LENGTH_Y = 2.828427; 
 
-  Neku() {
+  Neku(Minim m) {
+    minim = m;
+    stepAudio = minim.loadFile("Step.wav");
+    stepAudio.setGain(-20);
+    
     leftRunSprites = new PImage[]{
       loadImage("Neku_Run_Left1.png"),
       loadImage("Neku_Run_Left2.png"),
@@ -153,7 +160,7 @@ class Neku {
     direction = dDOWN;
     scale = 1;
     
-    keyIsPressed = new boolean[]{ false, false, false, false };
+    keyIsPressed = new boolean[]{ false, false, false, false };    
   }
   
   void display() {    
@@ -162,46 +169,8 @@ class Neku {
   }
   
   void move() {
-    if (keyIsPressed[dUP] && !keyIsPressed[dLEFT] && !keyIsPressed[dRIGHT]) {
-      println("up");
-      direction = dUP;
-      goUp();
-      updateSpriteSize();
-    } else if (keyIsPressed[dDOWN] && !keyIsPressed[dLEFT] && !keyIsPressed[dRIGHT]) {
-      println("down");
-      direction = dDOWN;
-      goDown();
-      updateSpriteSize();
-    } else if (keyIsPressed[dLEFT] && !keyIsPressed[dUP] && !keyIsPressed[dDOWN]) {
-      println("left");
-      direction = dLEFT;
-      goLeft();
-    } else if (keyIsPressed[dRIGHT] && !keyIsPressed[dUP] && !keyIsPressed[dDOWN]) {
-      println("right");
-      direction = dRIGHT;
-      goRight();
-    } else if (keyIsPressed[dUP] && keyIsPressed[dLEFT]) {
-      println("up left");
-      direction = dUP_LEFT;
-      goUpLeft();
-      updateSpriteSize();
-    } else if (keyIsPressed[dUP] && keyIsPressed[dRIGHT]) {
-      println("up right");
-      direction = dUP_RIGHT;
-      goUpRight();
-      updateSpriteSize();
-    } else if (keyIsPressed[dDOWN] && keyIsPressed[dLEFT]) {
-      println("down left");
-      direction = dDOWN_LEFT;
-      goDownLeft();
-      updateSpriteSize();
-    } else if (keyIsPressed[dDOWN] && keyIsPressed[dRIGHT]) {
-      println("down right");
-      direction = dDOWN_RIGHT;
-      goDownRight();
-      updateSpriteSize();
-    } else {
-      final int sIndex = (spriteIndex/3) % NUM_SPRITES_IN_ONE_STEP;
+    if (!keyIsPressed[dUP] && !keyIsPressed[dDOWN] && !keyIsPressed[dLEFT] && !keyIsPressed[dRIGHT]) {
+      final int sIndex = (spriteIndex/4) % NUM_SPRITES_IN_ONE_STEP;
       final boolean currentSpriteIndexSmoothlyTransitionsIntoStandingPosition = 
           direction == dDOWN_LEFT || direction == dDOWN_RIGHT ? (sIndex == 0 || sIndex == 6) : (sIndex == 1 || sIndex == 5);
       if (!currentSpriteIndexSmoothlyTransitionsIntoStandingPosition) {
@@ -210,52 +179,99 @@ class Neku {
       } else {
         println("standing");
         stand(); 
+      } 
+    } else {  
+      if (keyIsPressed[dUP] && !keyIsPressed[dLEFT] && !keyIsPressed[dRIGHT]) {
+        println("up");
+        direction = dUP;
+        goUp();
+        updateSpriteSize();
+      } else if (keyIsPressed[dDOWN] && !keyIsPressed[dLEFT] && !keyIsPressed[dRIGHT]) {
+        println("down");
+        direction = dDOWN;
+        goDown();
+        updateSpriteSize();
+      } else if (keyIsPressed[dLEFT] && !keyIsPressed[dUP] && !keyIsPressed[dDOWN]) {
+        println("left");
+        direction = dLEFT;
+        goLeft();
+      } else if (keyIsPressed[dRIGHT] && !keyIsPressed[dUP] && !keyIsPressed[dDOWN]) {
+        println("right");
+        direction = dRIGHT;
+        goRight();
+      } else if (keyIsPressed[dUP] && keyIsPressed[dLEFT]) {
+        println("up left");
+        direction = dUP_LEFT;
+        goUpLeft();
+        updateSpriteSize();
+      } else if (keyIsPressed[dUP] && keyIsPressed[dRIGHT]) {
+        println("up right");
+        direction = dUP_RIGHT;
+        goUpRight();
+        updateSpriteSize();
+      } else if (keyIsPressed[dDOWN] && keyIsPressed[dLEFT]) {
+        println("down left");
+        direction = dDOWN_LEFT;
+        goDownLeft();
+        updateSpriteSize();
+      } else if (keyIsPressed[dDOWN] && keyIsPressed[dRIGHT]) {
+        println("down right");
+        direction = dDOWN_RIGHT;
+        goDownRight();
+        updateSpriteSize();
+      }
+      
+      // Play or reset the step sound
+      if ((spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP == 1) || (spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP == 5)) {
+        stepAudio.play(); 
+      } else if ((spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP == 0) || (spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP == 4)) {
+        stepAudio.rewind(); 
       }
     }    
   }
   
   void goLeft() {
-    activeSprite = leftRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    activeSprite = leftRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     xPos = constrain(xPos - HORIZONTAL_STEP_LENGTH, 0, width);
   }
   
   void goRight() {
-    activeSprite = rightRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    activeSprite = rightRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     xPos = constrain(xPos + HORIZONTAL_STEP_LENGTH, 0, width);
   }
   
   void goUp() {
-    activeSprite = upRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    activeSprite = upRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     yPos = constrain(yPos - VERTICAL_STEP_LENGTH, ScreenSeparator.CENTER_Y_BOTTOM, height);
     scale *= 0.97;
   }
   
   void goDown() {
-    activeSprite = downRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    activeSprite = downRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     yPos = constrain(yPos + VERTICAL_STEP_LENGTH, ScreenSeparator.CENTER_Y_BOTTOM, height);
     scale /= 0.97;
   }
   
   void goDownLeft() {
-    activeSprite = downLeftRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    activeSprite = downLeftRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     xPos = constrain(xPos - DIAGONAL_STEP_LENGTH_X, 0, width);
     yPos = constrain(yPos + DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
   }
   
   void goDownRight() {
-    activeSprite = downRightRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    activeSprite = downRightRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     xPos = constrain(xPos + DIAGONAL_STEP_LENGTH_X, 0, width);
     yPos = constrain(yPos + DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
   }
   
   void goUpLeft() {
-    activeSprite = upLeftRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    activeSprite = upLeftRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     xPos = constrain(xPos - DIAGONAL_STEP_LENGTH_X, 0, width);
     yPos = constrain(yPos - DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
   }
   
   void goUpRight() {
-    activeSprite = upRightRunSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_STEP];
+    activeSprite = upRightRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     xPos = constrain(xPos + DIAGONAL_STEP_LENGTH_X, 0, width);
     yPos = constrain(yPos - DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
   }
