@@ -20,9 +20,8 @@ class Battle {
       backgroundMusic.loop();
       musicIsPlaying = true; 
     }
-    
-    displayTopScreen();
     displayBottomScreen();
+    displayTopScreen();
   }
     
   void displayTopScreen() {
@@ -34,8 +33,8 @@ class Battle {
     imageMode(CENTER);
     image(
         battleBottomImage.get(
-            battleBottomImage.width/2, 
-            battleBottomImage.height/2, 
+            (int)constrain(neku.xPos, ScreenSeparator.CENTER_X_BOTTOM - ScreenSeparator.SCREEN_WIDTH/2, battleBottomImage.width - ScreenSeparator.SCREEN_WIDTH), 
+            (int)map(neku.yPos, ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2, ScreenSeparator.CENTER_Y_BOTTOM + ScreenSeparator.SCREEN_HEIGHT/2, 0, battleBottomImage.height - ScreenSeparator.SCREEN_HEIGHT), 
             ScreenSeparator.SCREEN_WIDTH, 
             ScreenSeparator.SCREEN_HEIGHT
         ), 
