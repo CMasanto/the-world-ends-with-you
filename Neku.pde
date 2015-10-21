@@ -44,7 +44,7 @@ class Neku {
   final int dUP_LEFT = 7;
 
   final int NUM_SPRITES_IN_ONE_STEP = 8;  // The number of sprites in each PImage sprite array.
-  final float VERTICAL_STEP_LENGTH = 4.0;
+  final float VERTICAL_STEP_LENGTH = 2.0;
   final float HORIZONTAL_STEP_LENGTH = 4.0;
   final float DIAGONAL_STEP_LENGTH_X = 2.828427;
   final float DIAGONAL_STEP_LENGTH_Y = 2.828427; 
@@ -218,7 +218,7 @@ class Neku {
         println("down right");
         direction = dDOWN_RIGHT;
         goDownRight();
-        updateSpriteSize();
+//        updateSpriteSize();
       }
       
       // Play or reset the step sound
@@ -243,13 +243,11 @@ class Neku {
   void goUp() {
     activeSprite = upRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     yPos = constrain(yPos - VERTICAL_STEP_LENGTH, ScreenSeparator.CENTER_Y_BOTTOM, height);
-    scale *= 0.97;
   }
   
   void goDown() {
     activeSprite = downRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     yPos = constrain(yPos + VERTICAL_STEP_LENGTH, ScreenSeparator.CENTER_Y_BOTTOM, height);
-    scale /= 0.97;
   }
   
   void goDownLeft() {
@@ -357,36 +355,36 @@ class Neku {
   }
   
   void updateSpriteSize() {
-    switch (direction) {
-      case dUP:
-        scale = constrain(scale*0.995, 0.7, 1);
-        activeSprite.resize((int)(VERTICAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
-        break;
-        
-      case dDOWN:
-        scale = constrain(scale/0.995, 0.7, 1);
-        activeSprite.resize((int)(VERTICAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
-        break;
-        
-      case dUP_RIGHT:
-        scale = constrain(scale*0.995, 0.7, 1);
-        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
-        break;
-        
-      case dDOWN_RIGHT:
-        scale = constrain(scale/0.995, 0.7, 1);
-        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
-        break;
-        
-      case dDOWN_LEFT:
-        scale = constrain(scale/0.995, 0.7, 1);
-        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
-        break;
-        
-      case dUP_LEFT:
-        scale = constrain(scale*0.995, 0.7, 1);
-        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
-        break;
-    }
+//    switch (direction) {
+//      case dUP:
+//        scale = constrain(scale*0.995, 0.7, 1);
+//        activeSprite.resize((int)(VERTICAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+//        break;
+//        
+//      case dDOWN:
+//        scale = constrain(scale/0.995, 0.7, 1);
+//        activeSprite.resize((int)(VERTICAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+//        break;
+//        
+//      case dUP_RIGHT:
+//        scale = constrain(scale*0.995, 0.7, 1);
+//        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+//        break;
+//        
+//      case dDOWN_RIGHT:
+//        scale = constrain(scale/0.995, 0.7, 1);
+//        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+//        break;
+//        
+//      case dDOWN_LEFT:
+//        scale = constrain(scale/0.995, 0.7, 1);
+//        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+//        break;
+//        
+//      case dUP_LEFT:
+//        scale = constrain(scale*0.995, 0.7, 1);
+//        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
+//        break;
+//    }
   }
 }

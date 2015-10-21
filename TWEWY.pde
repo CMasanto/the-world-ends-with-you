@@ -59,6 +59,8 @@ void draw() {
     skullPin.display();
   } else if (state == BATTLE_STATE) {
     battle.display(); 
+    neku.move();
+    neku.display();
   }
   
   displayStylus();

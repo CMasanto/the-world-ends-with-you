@@ -48,7 +48,7 @@ class Shibuya {
     image(
         scrambleCrossingBottom.get(
             (int)constrain(neku.xPos, ScreenSeparator.CENTER_X_BOTTOM - ScreenSeparator.SCREEN_WIDTH/2, scrambleCrossingBottom.width - ScreenSeparator.SCREEN_WIDTH), 
-            (int)constrain(neku.yPos, ScreenSeparator.SCREEN_HEIGHT/2, scrambleCrossingBottom.height - ScreenSeparator.SCREEN_HEIGHT), 
+            (int)map(neku.yPos, ScreenSeparator.CENTER_Y_BOTTOM, ScreenSeparator.CENTER_Y_BOTTOM + ScreenSeparator.SCREEN_HEIGHT/2, 0, scrambleCrossingBottom.height - ScreenSeparator.SCREEN_HEIGHT), 
             ScreenSeparator.SCREEN_WIDTH, 
             ScreenSeparator.SCREEN_HEIGHT
         ), 
