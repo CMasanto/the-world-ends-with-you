@@ -29,6 +29,8 @@ class Neku {
   Minim minim;
   AudioPlayer stepAudio;
   
+  boolean isBattling;
+  
   final int SPRITE_HEIGHT = 66;  // The original height of all Neku sprites
   final int DIAGONAL_SPRITE_WIDTH = 48;  // The width of Neku sprites moving diagonally.
   final int HORIZONTAL_SPRITE_WIDTH = 56;  // The width of Neku sprites moving horizontally.
@@ -161,6 +163,8 @@ class Neku {
     scale = 1;
     
     keyIsPressed = new boolean[]{ false, false, false, false };    
+    
+    isBattling = false;
   }
   
   void display() {    
@@ -242,36 +246,54 @@ class Neku {
   
   void goUp() {
     activeSprite = upRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
-    yPos = constrain(yPos - VERTICAL_STEP_LENGTH, ScreenSeparator.CENTER_Y_BOTTOM, height);
+    
+    float yLowerBound = isBattling ? ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2 + SPRITE_HEIGHT/2 : 
+        ScreenSeparator.CENTER_Y_BOTTOM + 25;
+    yPos = constrain(yPos - VERTICAL_STEP_LENGTH, yLowerBound, height - SPRITE_HEIGHT/2);
   }
   
   void goDown() {
     activeSprite = downRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
-    yPos = constrain(yPos + VERTICAL_STEP_LENGTH, ScreenSeparator.CENTER_Y_BOTTOM, height);
+    
+    float yLowerBound = isBattling ? ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2 + SPRITE_HEIGHT/2 : 
+        ScreenSeparator.CENTER_Y_BOTTOM + 25;
+    yPos = constrain(yPos + VERTICAL_STEP_LENGTH, yLowerBound, height - SPRITE_HEIGHT/2);
   }
   
   void goDownLeft() {
     activeSprite = downLeftRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     xPos = constrain(xPos - DIAGONAL_STEP_LENGTH_X, 0, width);
-    yPos = constrain(yPos + DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
+    
+    float yLowerBound = isBattling ? ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2 + SPRITE_HEIGHT/2 : 
+        ScreenSeparator.CENTER_Y_BOTTOM + 25;
+    yPos = constrain(yPos + DIAGONAL_STEP_LENGTH_Y, yLowerBound, height - SPRITE_HEIGHT/2);
   }
   
   void goDownRight() {
     activeSprite = downRightRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     xPos = constrain(xPos + DIAGONAL_STEP_LENGTH_X, 0, width);
-    yPos = constrain(yPos + DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
+    
+    float yLowerBound = isBattling ? ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2 + SPRITE_HEIGHT/2 : 
+        ScreenSeparator.CENTER_Y_BOTTOM + 25;
+    yPos = constrain(yPos + DIAGONAL_STEP_LENGTH_Y, yLowerBound, height - SPRITE_HEIGHT/2);
   }
   
   void goUpLeft() {
     activeSprite = upLeftRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     xPos = constrain(xPos - DIAGONAL_STEP_LENGTH_X, 0, width);
-    yPos = constrain(yPos - DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
+    
+    float yLowerBound = isBattling ? ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2 + SPRITE_HEIGHT/2 : 
+        ScreenSeparator.CENTER_Y_BOTTOM + 25;
+    yPos = constrain(yPos - DIAGONAL_STEP_LENGTH_Y, yLowerBound, height - SPRITE_HEIGHT/2);
   }
   
   void goUpRight() {
     activeSprite = upRightRunSprites[++spriteIndex/4 % NUM_SPRITES_IN_ONE_STEP];
     xPos = constrain(xPos + DIAGONAL_STEP_LENGTH_X, 0, width);
-    yPos = constrain(yPos - DIAGONAL_STEP_LENGTH_Y, ScreenSeparator.CENTER_Y_BOTTOM, height);
+    
+    float yLowerBound = isBattling ? ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2 + SPRITE_HEIGHT/2 : 
+        ScreenSeparator.CENTER_Y_BOTTOM + 25;
+    yPos = constrain(yPos - DIAGONAL_STEP_LENGTH_Y, yLowerBound, height - SPRITE_HEIGHT/2);
   }
   
   void stand() {

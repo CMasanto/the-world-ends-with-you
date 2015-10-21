@@ -8,6 +8,7 @@ Shibuya shibuya;
 SkullPin skullPin;
 Neku neku;
 Battle battle;
+Bat bat;
 
 Minim minim;
 
@@ -29,6 +30,7 @@ void setup() {
   neku = new Neku(minim);
   shibuya = new Shibuya(minim, neku);
   battle = new Battle(minim);
+  bat = new Bat(neku.xPos, neku.yPos, minim, neku);
   
   state = START_STATE;
 }
@@ -45,6 +47,7 @@ void draw() {
      shibuya.playAudio();
   } else if ((state == SCRAMBLE_STATE) && (skullPin.isReadyForBattle)) {
     state = BATTLE_STATE; 
+    neku.isBattling = true;
   }
   
   // Display the correct state.
@@ -61,6 +64,7 @@ void draw() {
     battle.display(); 
     neku.move();
     neku.display();
+    bat.display();
   }
   
   displayStylus();
@@ -68,10 +72,14 @@ void draw() {
 }
 
 void displayStylus() {
+  if (state == BATTLE_STATE) {
+    fill(255, 0, 0, 175);  // Red stylus, but only during battle.
+  } else {
     fill(255, 175);
-    noStroke();
-    noCursor();
-    ellipse(mouseX, mouseY, 10, 10); 
+  }
+  noStroke();
+  noCursor();
+  ellipse(mouseX, mouseY, 10, 10); 
 }
 
 void keyPressed() {
