@@ -6,6 +6,7 @@ class Neku {
   float yPos;
   float scale;
   int direction;
+  boolean canMove;
   boolean[] keyIsPressed;
   
   PImage[] leftRunSprites;
@@ -16,6 +17,11 @@ class Neku {
   PImage[] upRightRunSprites;
   PImage[] downLeftRunSprites;
   PImage[] downRightRunSprites;
+  
+  PImage[] fallSprites;
+  PImage[] fallDownRightSprites;
+  PImage[] fallDownLeftSprites;
+  int fallIndex;
   
   PImage leftStandSprite;
   PImage rightStandSprite;
@@ -30,6 +36,7 @@ class Neku {
   AudioPlayer stepAudio;
   
   boolean isBattling;
+  boolean isHit;
   
   final int SPRITE_HEIGHT = 66;  // The original height of all Neku sprites
   final int DIAGONAL_SPRITE_WIDTH = 48;  // The width of Neku sprites moving diagonally.
@@ -46,15 +53,17 @@ class Neku {
   final int dUP_LEFT = 7;
 
   final int NUM_SPRITES_IN_ONE_STEP = 8;  // The number of sprites in each PImage sprite array.
-  final float VERTICAL_STEP_LENGTH = 2.0;
+  final float VERTICAL_STEP_LENGTH = 4.0;
   final float HORIZONTAL_STEP_LENGTH = 4.0;
   final float DIAGONAL_STEP_LENGTH_X = 2.828427;
-  final float DIAGONAL_STEP_LENGTH_Y = 2.828427; 
+  final float DIAGONAL_STEP_LENGTH_Y = 2.828427;
+ 
+ final int NUM_SPRITES_IN_FALL = 10; 
 
   Neku(Minim m) {
     minim = m;
     stepAudio = minim.loadFile("Step.wav");
-    stepAudio.setGain(-40);
+    stepAudio.setGain(-22);
     
     leftRunSprites = new PImage[]{
       loadImage("Neku_Run_Left1.png"),
@@ -153,8 +162,34 @@ class Neku {
     downLeftStandSprite = loadImage("Neku_Stand_Down_Left.png");
     downRightStandSprite = loadImage("Neku_Stand_Down_Right.png");
     
+    fallDownRightSprites = new PImage[]{
+      loadImage("Neku_Fall_Right1.png"),
+      loadImage("Neku_Fall_Right2.png"),
+      loadImage("Neku_Fall_Right3.png"),
+      loadImage("Neku_Fall_Right4.png"),
+      loadImage("Neku_Fall_Right5.png"),
+      loadImage("Neku_Fall_Right6.png"),
+      loadImage("Neku_Fall_Right7.png"),
+      loadImage("Neku_Fall_Right8.png"),
+      loadImage("Neku_Fall_Right9.png"),
+      loadImage("Neku_Fall_Right10.png")
+    };
+    fallDownLeftSprites = new PImage[]{
+      loadImage("Neku_Fall_Left1.png"),
+      loadImage("Neku_Fall_Left2.png"),
+      loadImage("Neku_Fall_Left3.png"),
+      loadImage("Neku_Fall_Left4.png"),
+      loadImage("Neku_Fall_Left5.png"),
+      loadImage("Neku_Fall_Left6.png"),
+      loadImage("Neku_Fall_Left7.png"),
+      loadImage("Neku_Fall_Left8.png"),
+      loadImage("Neku_Fall_Left9.png"),
+      loadImage("Neku_Fall_Left10.png")
+    };
+  
     activeSprite = downStandSprite;
     spriteIndex = 0;
+    canMove = true;
     
     // Set Neku at the very bottom of the player's screen, and at normal size (i.e., scale), looking ahead.
     xPos = ScreenSeparator.CENTER_X_BOTTOM;
@@ -165,6 +200,7 @@ class Neku {
     keyIsPressed = new boolean[]{ false, false, false, false };    
     
     isBattling = false;
+    isHit = false;
   }
   
   void display() {    
@@ -373,7 +409,7 @@ class Neku {
     ellipseMode(CENTER);
     noStroke();
     fill(30,30, 30, 128);
-    ellipse(xPos, yPos + SPRITE_HEIGHT/2, VERTICAL_SPRITE_WIDTH*scale, VERTICAL_SPRITE_WIDTH*scale/2);
+    ellipse(xPos, yPos + SPRITE_HEIGHT/2 - 10, VERTICAL_SPRITE_WIDTH*scale, VERTICAL_SPRITE_WIDTH*scale/2);
   }
   
   void updateSpriteSize() {
@@ -408,5 +444,15 @@ class Neku {
 //        activeSprite.resize((int)(DIAGONAL_SPRITE_WIDTH*scale), (int)(SPRITE_HEIGHT*scale)); 
 //        break;
 //    }
+  }
+  
+  void fallDown() {    
+    activeSprite = fallSprites[++fallIndex/4 % NUM_SPRITES_IN_FALL];
+    if((fallIndex/4 % NUM_SPRITES_IN_FALL == 6) && (random(0, 100) > 20)) {  // Increase time the fallen neku stays flat on the ground.
+      fallIndex--;
+    }
+    
+    float pixelsToMove = fallIndex/4 % NUM_SPRITES_IN_FALL <= 5 ? 1.5 : 0;
+    xPos = direction == dLEFT ? constrain(xPos + pixelsToMove, 0, width) : constrain(xPos - pixelsToMove, 0, width);  
   }
 }

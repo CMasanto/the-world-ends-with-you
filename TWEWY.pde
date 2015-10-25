@@ -8,7 +8,7 @@ Shibuya shibuya;
 SkullPin skullPin;
 Neku neku;
 Battle battle;
-Bat bat;
+ArrayList<Bat> enemies;
 
 Minim minim;
 
@@ -18,9 +18,10 @@ final int TRANSITION_STATE = 2;
 final int SCRAMBLE_STATE = 3;
 final int BATTLE_STATE = 5;
 
+final int ENEMIES_PER_BATTLE = 5;
+
 void setup() {
   size(458, 700); 
-//  frameRate(20);
   minim = new Minim(this);
   
   screenSeparator = new ScreenSeparator();
@@ -30,7 +31,6 @@ void setup() {
   neku = new Neku(minim);
   shibuya = new Shibuya(minim, neku);
   battle = new Battle(minim);
-  bat = new Bat(neku.xPos, neku.yPos, minim, neku);
   
   state = START_STATE;
 }
@@ -48,6 +48,8 @@ void draw() {
   } else if ((state == SCRAMBLE_STATE) && (skullPin.isReadyForBattle)) {
     state = BATTLE_STATE; 
     neku.isBattling = true;
+    neku.canMove = true;
+    initializeEnemies();
   }
   
   // Display the correct state.
@@ -61,10 +63,22 @@ void draw() {
     neku.display();
     skullPin.display();
   } else if (state == BATTLE_STATE) {
-    battle.display(); 
-    neku.move();
+    battle.display();
+    
+    updateNekuStatus();
+    if (!neku.isHit) {
+      neku.move();
+    } else {
+      neku.fallDown(); 
+    }
+    
     neku.display();
-    bat.display();
+    for (Bat b : enemies) {
+      if (neku.isHit) {
+        b.isAttacking = false; 
+      }
+      b.display(); 
+    }
   }
   
   displayStylus();
@@ -82,8 +96,32 @@ void displayStylus() {
   ellipse(mouseX, mouseY, 10, 10); 
 }
 
+void initializeEnemies() {
+  enemies = new ArrayList<Bat>();
+  for (int i = 0; i < ENEMIES_PER_BATTLE; i++) {
+    float batX = -1;
+    float batY = -1;
+    batX = random(
+        ScreenSeparator.CENTER_X_BOTTOM - ScreenSeparator.SCREEN_WIDTH/2,
+        ScreenSeparator.CENTER_X_BOTTOM + ScreenSeparator.SCREEN_WIDTH/2);
+        
+    batY = random(
+        ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2,
+        ScreenSeparator.CENTER_Y_BOTTOM + ScreenSeparator.SCREEN_HEIGHT/2);    
+    enemies.add(new Bat(batX, batY, minim, neku)); 
+  } 
+}
+
 void keyPressed() {
   println("key pressed");
+  if (!neku.canMove) {
+    neku.keyIsPressed[neku.dUP] = false;
+    neku.keyIsPressed[neku.dDOWN] = false;
+    neku.keyIsPressed[neku.dLEFT] = false;
+    neku.keyIsPressed[neku.dRIGHT] = false;
+    return;
+  }
+  
   if (key == CODED) {
     switch (keyCode) {
       case UP: 
@@ -138,11 +176,13 @@ void mousePressed() {
     if (dist(mouseX, mouseY, skullPin.X_POS, skullPin.Y_POS) <= skullPin.PIN_RADIUS) {
       skullPin.isActivated = !skullPin.isActivated;
       if (!skullPin.isActivated) {
+        neku.canMove = true;
         skullPin.focusAudio.pause();
         skullPin.focusAudio.rewind(); // Reset "focus" sound effect when user deactivates pin.
         skullPin.activationFieldRadius = skullPin.INITIAL_FIELD_RADIUS;  // Reset the field radius when deactivated.
       } else {
         skullPin.focusAudio.play(); 
+        neku.canMove = false;
       }
     } else if (skullPin.isActivated && dist(mouseX, mouseY, skullPin.noiseXPos, skullPin.noiseYPos) <= skullPin.NOISE_SYMBOL_RADIUS) {
       skullPin.isTransitioningToBattle = true;
@@ -153,4 +193,28 @@ void mousePressed() {
       }
     }
   }
+}
+
+void updateNekuStatus() {
+  if (neku.isHit && (neku.fallIndex == neku.NUM_SPRITES_IN_FALL * 4)) {
+    neku.isHit = false;
+    return; 
+  }
+  
+  for (Bat b : enemies) {
+    if (!neku.isHit && b.isAttacking && (dist(b.xPos, b.yPos, neku.xPos, neku.yPos) <= 20)) {
+      neku.isHit = true; 
+      neku.fallIndex = 0;
+      if (b.xPos < neku.xPos) {
+        neku.fallSprites = neku.fallDownRightSprites;
+        neku.direction = neku.dLEFT;
+      } else {
+        neku.fallSprites = neku.fallDownLeftSprites;
+        neku.direction = neku.dRIGHT;
+      }
+      
+      neku.fallDown();
+      return;
+    }
+  } 
 }
