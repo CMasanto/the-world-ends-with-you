@@ -1,9 +1,15 @@
 class Bat {
+  int frameCounter;
+  
   PImage activeSprite;
   int spriteIndex;  // Tracks the index of the active sprite within its PImage array.
   
   float xPos;
   float yPos;
+  
+  float xMoveAttack;
+  float yMoveAttack;
+  
   boolean facingRight;
   boolean isAttacking;
   
@@ -22,14 +28,22 @@ class Bat {
   float currentEnemyX;
   float currentEnemyY;
   
+  int shadowDistance;  // The number of pixels the Bat's shadow appears below the bat (decreases when Bat attacks Neku).
+  
   final int SPRITE_WIDTH = 50;
   final int SPRITE_HEIGHT = 68; 
   final int NUM_SPRITES_IN_ONE_FLAP = 6;  // The number of sprites in each PImage sprite array.
+  final int NUM_SPRITES_IN_ONE_ATTACK = 4;
+  final int NUM_FRAMES_TO_ATTACK = 100;  // The duration of the bat's movement towards Neku.
+  
+  int attackFrame;  // The current frame during the attack (whch will last NUM_FRAMES_TO_ATTACK frames).
+  int waitingFrames;  // The amount of time between attacks.
   
   Bat(float x, float y, Minim m, Neku n) {
+    frameCounter = 1;
+
     xPos = x;
     yPos = y;
-    isAttacking = false;
     
     minim = m;
     enemy = n;
@@ -44,18 +58,33 @@ class Bat {
     };   
   
     rightSprites = new PImage[]{
-//        loadImage("Bat_Right1.png"),
-//        loadImage("Bat_Right2.png"),
-//        loadImage("Bat_Right3.png"),
-//        loadImage("Bat_Right4.png"),
-//        loadImage("Bat_Right5.png"),
-//        loadImage("Bat_Right6.png"),
-//        loadImage("Bat_Right7.png"),
-//        loadImage("Bat_Right8.png")
+        loadImage("Bat_Right1.png"),
+        loadImage("Bat_Right2.png"),
+        loadImage("Bat_Right3.png"),
+        loadImage("Bat_Right4.png"),
+        loadImage("Bat_Right5.png"),
+        loadImage("Bat_Right6.png")
     };    
+    
+    leftAttackSprites = new PImage[] {
+        loadImage("Bat_Attack_Left1.png"),
+        loadImage("Bat_Attack_Left2.png"),
+        loadImage("Bat_Attack_Left3.png"),
+        loadImage("Bat_Attack_Left4.png") 
+    };
+    
+    rightAttackSprites = new PImage[] {
+        loadImage("Bat_Attack_Right1.png"),
+        loadImage("Bat_Attack_Right2.png"),
+        loadImage("Bat_Attack_Right3.png"),
+        loadImage("Bat_Attack_Right4.png") 
+    };
     
     currentEnemyX = neku.xPos;
     currentEnemyY = neku.yPos;
+    
+    isAttacking = false;
+    waitingFrames = (int)random(240, 600);
   }
   
   void display() {
@@ -63,13 +92,28 @@ class Bat {
     
     faceEnemy();
     if (isAttacking) {
-     
+      attack();
     } else {
       flap();
+    }
+    
+    if (yPos >= ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2) {
+      image(activeSprite, xPos, yPos);
+    }
+    
+    if (yPos >= ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2 - 75) {
       drawShadow(); 
     }
-     image(activeSprite, xPos, yPos);
-//     updatePositionOnScreen();
+
+    if (!isAttacking && (frameCounter++ % waitingFrames == 0)) {
+      attackFrame = 0;
+      isAttacking = true;
+      yPos += 20;  // Bat lowers itself to the ground when attacking
+    } else if (isAttacking && (attackFrame++ == 200)) {
+      frameCounter = 1;
+      isAttacking = false; 
+      yPos -= 20;
+    }
   }
   
   void updatePosition() {
@@ -84,15 +128,14 @@ class Bat {
   }
   
   void faceEnemy() {
-    facingRight = enemy.xPos > this.xPos;
+    facingRight = enemy.xPos < this.xPos;
   }
   
   void flap() {
     if (facingRight) {
       activeSprite = leftSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_FLAP];
     } else {
-//      activeSprite = rightSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_FLAP];
-      activeSprite = leftSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_FLAP];
+      activeSprite = rightSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_FLAP];
     }
   }
   
@@ -100,6 +143,23 @@ class Bat {
     ellipseMode(CENTER);
     noStroke();
     fill(30, 30, 30, 100);
-    ellipse(xPos, yPos + 150, 40, 20);  
+    if (isAttacking) {
+      ellipse(xPos, yPos + 55, 40, 20);  
+    } else {
+      ellipse(xPos, yPos + 75, 40, 20);  
+    }
+  }
+  
+  void attack() {
+    if (facingRight) {
+      activeSprite = leftAttackSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_ATTACK];
+    } else {
+      activeSprite = rightAttackSprites[++spriteIndex/3 % NUM_SPRITES_IN_ONE_ATTACK];
+    }  
+    
+    if (dist(xPos, yPos, neku.xPos, neku.yPos) > 20) {
+      xPos += xPos < neku.xPos ? 3 : -3;
+      yPos += yPos < neku.yPos ? 4.2 : -4.2;
+    }
   }
 }
