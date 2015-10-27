@@ -23,6 +23,11 @@ class Neku {
   PImage[] fallDownLeftSprites;
   int fallIndex;
   
+  PImage[] attackSprites;
+  PImage[] attackSpritesLeft;
+  PImage[] attackSpritesRight;
+  int attackIndex;
+  
   PImage leftStandSprite;
   PImage rightStandSprite;
   PImage upStandSprite;
@@ -37,6 +42,7 @@ class Neku {
   
   boolean isBattling;
   boolean isHit;
+  boolean isAttacking;
   
   final int SPRITE_HEIGHT = 66;  // The original height of all Neku sprites
   final int DIAGONAL_SPRITE_WIDTH = 48;  // The width of Neku sprites moving diagonally.
@@ -59,6 +65,7 @@ class Neku {
   final float DIAGONAL_STEP_LENGTH_Y = 2.828427;
  
  final int NUM_SPRITES_IN_FALL = 10; 
+ final int NUM_SPRITES_IN_ATTACK = 7; 
 
   Neku(Minim m) {
     minim = m;
@@ -186,7 +193,26 @@ class Neku {
       loadImage("Neku_Fall_Left9.png"),
       loadImage("Neku_Fall_Left10.png")
     };
-  
+    
+    attackSpritesLeft = new PImage[]{
+      loadImage("attack_left1.png"),
+      loadImage("attack_left2.png"),
+      loadImage("attack_left3.png"),
+      loadImage("attack_left4.png"),
+      loadImage("attack_left5.png"),
+      loadImage("attack_left6.png"),
+      loadImage("attack_left7.png")    
+    };
+    attackSpritesRight = new PImage[]{
+      loadImage("attack_right1.png"),
+      loadImage("attack_right2.png"),
+      loadImage("attack_right3.png"),
+      loadImage("attack_right4.png"),
+      loadImage("attack_right5.png"),
+      loadImage("attack_right6.png"),
+      loadImage("attack_right7.png") 
+    };
+    
     activeSprite = downStandSprite;
     spriteIndex = 0;
     canMove = true;
@@ -454,5 +480,12 @@ class Neku {
     
     float pixelsToMove = fallIndex/4 % NUM_SPRITES_IN_FALL <= 5 ? 1.5 : 0;
     xPos = direction == dLEFT ? constrain(xPos + pixelsToMove, 0, width) : constrain(xPos - pixelsToMove, 0, width);  
+  }
+  
+  void attack() {
+    activeSprite = attackSprites[++attackIndex/4 % NUM_SPRITES_IN_ATTACK];
+    if((attackIndex/4 % NUM_SPRITES_IN_ATTACK == 5) && (random(0, 100) > 20)) {  // Increase time the attacking neku stays in cool position.
+      attackIndex--;
+    }
   }
 }

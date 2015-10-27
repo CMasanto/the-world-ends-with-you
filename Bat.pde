@@ -84,7 +84,7 @@ class Bat {
     currentEnemyY = neku.yPos;
     
     isAttacking = false;
-    waitingFrames = (int)random(240, 600);
+    waitingFrames = (int)random(180, 300);
   }
   
   void display() {
