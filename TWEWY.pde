@@ -18,24 +18,25 @@ final int TRANSITION_STATE = 2;
 final int SCRAMBLE_STATE = 3;
 final int BATTLE_STATE = 5;
 
-final int ENEMIES_PER_BATTLE = 5;
+final int ENEMIES_PER_BATTLE = 4;
 
 void setup() {
   size(458, 700); 
   minim = new Minim(this);
-  
+
   screenSeparator = new ScreenSeparator();
   startScreen = new StartScreen(minim);
   transition = new Transition();
   skullPin = new SkullPin(minim);
   neku = new Neku(minim);
   shibuya = new Shibuya(minim, neku);
-  battle = new Battle(minim);
+  battle = new Battle(minim, neku);
   
   state = START_STATE;
 }
 
 void draw() {  
+
   // Update the game's status.
   if ((state == START_STATE) && (startScreen.hasPressedStart)) {
     startScreen.display();
@@ -49,6 +50,8 @@ void draw() {
     state = BATTLE_STATE; 
     neku.isBattling = true;
     neku.canMove = true;
+    neku.xPos = ScreenSeparator.CENTER_X_BOTTOM;
+    neku.yPos = ScreenSeparator.CENTER_Y_BOTTOM;
     initializeEnemies();
   }
   
@@ -66,16 +69,18 @@ void draw() {
     battle.display();
     
     updateNekuStatus();
-    if (!neku.isHit) {
-      neku.move();
+    if (neku.isHit) {
+      neku.fallDown();
+    } else if (neku.isAttacking){
+      neku.attack(); 
     } else {
-      neku.fallDown(); 
+      neku.move(); 
     }
     
     neku.display();
     for (Bat b : enemies) {
       if (neku.isHit) {
-        b.isAttacking = false; 
+        b.isAttacking = b.isAttacking && random(0, 100) < 20; 
       }
       b.display(); 
     }
@@ -192,6 +197,12 @@ void mousePressed() {
         skullPin.fadeInMusic();
       }
     }
+  } else if (state == BATTLE_STATE && !neku.isAttacking && !neku.isHit) {
+    print("Neku attacked");
+    neku.attackSprites = mouseX < neku.xPos ? neku.attackSpritesLeft : neku.attackSpritesRight;
+    neku.direction = mouseX < neku.xPos ? neku.dLEFT : neku.dRIGHT;
+    neku.isAttacking = true;
+    neku.attackIndex = 0;
   }
 }
 
@@ -199,6 +210,9 @@ void updateNekuStatus() {
   if (neku.isHit && (neku.fallIndex == neku.NUM_SPRITES_IN_FALL * 4)) {
     neku.isHit = false;
     return; 
+  } else if (neku.isAttacking && (neku.attackIndex == neku.NUM_SPRITES_IN_ATTACK * 4)) {
+    neku.isAttacking = false;
+    return;
   }
   
   for (Bat b : enemies) {
