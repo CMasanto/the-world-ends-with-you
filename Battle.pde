@@ -21,6 +21,7 @@ class Battle {
     neku = n;
     
     backgroundMusic = minim.loadFile("OneStar.mp3");
+    backgroundMusic.setGain(0);
     areYouReadyPlayer = minim.loadFile("Are_You_Ready.mp3");
     nekuIntro = minim.loadFile("Neku_Intro.mp3");
     musicIsPlaying = false; 
@@ -87,14 +88,14 @@ class Battle {
     fill(255, 255, 102, 175);
     textAlign(CENTER);
     textFont(font, 36);
-    text("Noise erased: " + numNoiseErased, ScreenSeparator.CENTER_X_TOP, ScreenSeparator.CENTER_Y_TOP + 75);
+    text("Noise erased: " + numNoiseErased, ScreenSeparator.CENTER_X_TOP, ScreenSeparator.CENTER_Y_TOP + 80);
     
     String min = Long.toString((millis() - startTime)/1000/60);
     String sec = Long.toString(((millis() - startTime)/1000) % 60);
     min = min.length() == 1 ? 0 + min : min;
     sec = sec.length() == 1 ? 0 + sec : min;
     
-    text(min + ":" + sec, ScreenSeparator.CENTER_X_TOP, ScreenSeparator.CENTER_Y_TOP + 120);
+//    text(min + ":" + sec, ScreenSeparator.CENTER_X_TOP, ScreenSeparator.CENTER_Y_TOP + 120);
   }
    
   void displayBottomScreen() {

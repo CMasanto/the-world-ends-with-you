@@ -39,6 +39,10 @@ class Neku {
   
   Minim minim;
   AudioPlayer stepAudio;
+  AudioPlayer attackVoice1;
+  AudioPlayer attackVoice2;
+  AudioPlayer slashSound;
+  AudioPlayer victory;
   
   boolean isBattling;
   boolean isHit;
@@ -71,6 +75,10 @@ class Neku {
     minim = m;
     stepAudio = minim.loadFile("Step.wav");
     stepAudio.setGain(-22);
+    attackVoice1 = minim.loadFile("nekuAttackVoice1.mp3");
+    attackVoice2 = minim.loadFile("nekuAttackVoice2.mp3");
+    slashSound = minim.loadFile("slashSound.mp3");
+    victory = minim.loadFile("victory.mp3");
     
     leftRunSprites = new PImage[]{
       loadImage("Neku_Run_Left1.png"),
@@ -487,5 +495,26 @@ class Neku {
     if((attackIndex/4 % NUM_SPRITES_IN_ATTACK == 5) && (random(0, 100) > 20)) {  // Increase time the attacking neku stays in cool position.
       attackIndex--;
     }
+  }
+  
+  void attackVoice() {
+    boolean playVoice1 = random(0, 100) < 50;
+    if (playVoice1) {
+      attackVoice1.rewind();
+      attackVoice1.play();
+    } else {
+      attackVoice2.rewind();
+      attackVoice2.play();    
+    }
+  }
+  
+  void makeSlashSound() {
+    slashSound.rewind();
+    slashSound.play();
+  }
+  
+  void victoryVoice() {
+    victory.rewind();
+    victory.play(); 
   }
 }
