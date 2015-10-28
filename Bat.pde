@@ -30,14 +30,19 @@ class Bat {
   
   int shadowDistance;  // The number of pixels the Bat's shadow appears below the bat (decreases when Bat attacks Neku).
   
-  final int SPRITE_WIDTH = 50;
-  final int SPRITE_HEIGHT = 68; 
-  final int NUM_SPRITES_IN_ONE_FLAP = 6;  // The number of sprites in each PImage sprite array.
-  final int NUM_SPRITES_IN_ONE_ATTACK = 4;
-  final int NUM_FRAMES_TO_ATTACK = 100;  // The duration of the bat's movement towards Neku.
+  final static int SPRITE_WIDTH = 50;
+  final static int SPRITE_HEIGHT = 68; 
+  final static int NUM_SPRITES_IN_ONE_FLAP = 6;  // The number of sprites in each PImage sprite array.
+  final static int NUM_SPRITES_IN_ONE_ATTACK = 4;
+  final static int NUM_FRAMES_TO_ATTACK = 100;  // The duration of the bat's movement towards Neku.
+  final static int NUM_HITS_BEFORE_DYING = 7;
+  
   
   int attackFrame;  // The current frame during the attack (whch will last NUM_FRAMES_TO_ATTACK frames).
   int waitingFrames;  // The amount of time between attacks.
+  
+  int hitCounter;
+  ArrayList<Slash> slashesThatHit;
   
   Bat(float x, float y, Minim m, Neku n) {
     frameCounter = 1;
@@ -84,7 +89,11 @@ class Bat {
     currentEnemyY = neku.yPos;
     
     isAttacking = false;
-    waitingFrames = (int)random(180, 300);
+    waitingFrames = (int)random(180, 400);
+    
+    slashesThatHit = new ArrayList<Slash>();
+    
+    deathNoise = minim.loadFile("batDeathNoise.wav");
   }
   
   void display() {
@@ -161,5 +170,9 @@ class Bat {
       xPos += xPos < neku.xPos ? 3 : -3;
       yPos += yPos < neku.yPos ? 4.2 : -4.2;
     }
+  }
+  
+  void die() {
+    deathNoise.play(); 
   }
 }

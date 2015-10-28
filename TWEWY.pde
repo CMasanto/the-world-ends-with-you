@@ -8,9 +8,15 @@ Shibuya shibuya;
 SkullPin skullPin;
 Neku neku;
 Battle battle;
+Slash slashAttack;
 ArrayList<Bat> enemies;
+ArrayList<Bat> defeated;
+
+PImage slashHitEnemyImage;
 
 Minim minim;
+
+int restartTransitionFrame = 0;
 
 int state;
 final int START_STATE = 1;
@@ -23,14 +29,11 @@ final int ENEMIES_PER_BATTLE = 4;
 void setup() {
   size(458, 700); 
   minim = new Minim(this);
-
-  screenSeparator = new ScreenSeparator();
   startScreen = new StartScreen(minim);
+  screenSeparator = new ScreenSeparator();
   transition = new Transition();
-  skullPin = new SkullPin(minim);
-  neku = new Neku(minim);
-  shibuya = new Shibuya(minim, neku);
-  battle = new Battle(minim, neku);
+  initializeVariables();
+  slashHitEnemyImage = loadImage("hit_sprite.png");
   
   state = START_STATE;
 }
@@ -53,6 +56,18 @@ void draw() {
     neku.xPos = ScreenSeparator.CENTER_X_BOTTOM;
     neku.yPos = ScreenSeparator.CENTER_Y_BOTTOM;
     initializeEnemies();
+    defeated = new ArrayList<Bat>();
+  } else if ((state == BATTLE_STATE) && (battle.numNoiseErased == enemies.size())) {
+    if ((restartTransitionFrame++ == 60)) {
+      neku.victoryVoice();
+      battle.backgroundMusic.shiftGain(battle.backgroundMusic.getGain(), -50, 2000);
+    } else if (restartTransitionFrame > 240) {
+      battle.backgroundMusic.pause();
+      battle.backgroundMusic.rewind();
+      initializeVariables();
+      shibuya.playAudio();
+      state = SCRAMBLE_STATE;
+    }
   }
   
   // Display the correct state.
@@ -67,12 +82,13 @@ void draw() {
     skullPin.display();
   } else if (state == BATTLE_STATE) {
     battle.display();
-    
     updateNekuStatus();
+    
     if (neku.isHit) {
       neku.fallDown();
     } else if (neku.isAttacking){
-      neku.attack(); 
+      neku.attack();
+      slashAttack.display();
     } else {
       neku.move(); 
     }
@@ -82,7 +98,9 @@ void draw() {
       if (neku.isHit) {
         b.isAttacking = b.isAttacking && random(0, 100) < 20; 
       }
-      b.display(); 
+      if (b.hitCounter < Bat.NUM_HITS_BEFORE_DYING) {
+        b.display();
+      } 
     }
   }
   
@@ -103,6 +121,7 @@ void displayStylus() {
 
 void initializeEnemies() {
   enemies = new ArrayList<Bat>();
+  final int numEnemies = (int)random(4, 7);
   for (int i = 0; i < ENEMIES_PER_BATTLE; i++) {
     float batX = -1;
     float batY = -1;
@@ -200,9 +219,14 @@ void mousePressed() {
   } else if (state == BATTLE_STATE && !neku.isAttacking && !neku.isHit) {
     print("Neku attacked");
     neku.attackSprites = mouseX < neku.xPos ? neku.attackSpritesLeft : neku.attackSpritesRight;
+    
+    slashAttack = neku.direction == neku.dLEFT ? new Slash(neku.xPos, neku.yPos, mouseX, mouseY) : new Slash(neku.xPos, neku.yPos, mouseX, mouseY);
+    slashAttack.slashSprites = neku.attackSprites == neku.attackSpritesLeft ? slashAttack.slashLeftSprites : slashAttack.slashRightSprites;
     neku.direction = mouseX < neku.xPos ? neku.dLEFT : neku.dRIGHT;
     neku.isAttacking = true;
     neku.attackIndex = 0;
+    neku.makeSlashSound();
+    neku.attackVoice();
   }
 }
 
@@ -216,9 +240,19 @@ void updateNekuStatus() {
   }
   
   for (Bat b : enemies) {
+    if (b.hitCounter >= Bat.NUM_HITS_BEFORE_DYING) {
+      if(!defeated.contains(b)) {
+        b.die();
+        battle.numNoiseErased++;
+        defeated.add(b);
+      }
+      continue;
+    }
+    
     if (!neku.isHit && b.isAttacking && (dist(b.xPos, b.yPos, neku.xPos, neku.yPos) <= 20)) {
       neku.isHit = true; 
       neku.fallIndex = 0;
+      
       if (b.xPos < neku.xPos) {
         neku.fallSprites = neku.fallDownRightSprites;
         neku.direction = neku.dLEFT;
@@ -229,6 +263,23 @@ void updateNekuStatus() {
       
       neku.fallDown();
       return;
+    } else if (slashAttack != null && dist(slashAttack.x, slashAttack.y, b.xPos, b.yPos) <= Slash.SPRITE_WIDTH) {
+      image(slashHitEnemyImage, b.xPos, b.yPos);
+      if (!b.slashesThatHit.contains(slashAttack)) {
+        b.slashesThatHit.add(slashAttack);
+        b.hitCounter++;
+      } 
     }
   } 
+}
+
+void initializeVariables() {
+  skullPin = new SkullPin(minim);
+  neku = new Neku(minim);
+  shibuya = new Shibuya(minim, neku);
+  battle = new Battle(minim, neku); 
+}
+
+void resetAudio() {
+  
 }

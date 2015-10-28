@@ -49,7 +49,7 @@ class SkullPin {
     minim = m;
     transitionMusic = minim.loadFile("Despair.mp3");
     focusAudio = minim.loadFile("Focus.mp3");
-    focusAudio.setVolume(2);
+    focusAudio.setGain(-8);
     musicIsFading = false;
   } 
 

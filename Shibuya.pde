@@ -38,7 +38,7 @@ class Shibuya {
    imageMode(CENTER);  // Required for the following, alternate version of drawing (a subsection of) the image.
    if (fadeInCounter < FADE_IN_TARGET_COUNT) {
      tint(255, fadeInCounter);
-     fadeInCounter ++;
+     fadeInCounter++;
    }
    image(scrambleCrossingTop, ScreenSeparator.CENTER_X_TOP, ScreenSeparator.CENTER_Y_TOP);
  }
