@@ -41,8 +41,15 @@ class Neku {
   AudioPlayer stepAudio;
   AudioPlayer attackVoice1;
   AudioPlayer attackVoice2;
+  AudioPlayer attackVoice3;
+  AudioPlayer attackVoice4;
   AudioPlayer slashSound;
   AudioPlayer victory;
+  AudioPlayer gotHitVoice1;
+  AudioPlayer gotHitVoice2;
+  AudioPlayer gotHitVoice3;
+  AudioPlayer gotHitVoice4;
+
   
   boolean isBattling;
   boolean isHit;
@@ -77,8 +84,14 @@ class Neku {
     stepAudio.setGain(-22);
     attackVoice1 = minim.loadFile("nekuAttackVoice1.mp3");
     attackVoice2 = minim.loadFile("nekuAttackVoice2.mp3");
+    attackVoice3 = minim.loadFile("nekuAttackVoice3.mp3");
+    attackVoice4 = minim.loadFile("nekuAttackVoice4.mp3");
     slashSound = minim.loadFile("slashSound.mp3");
     victory = minim.loadFile("victory.mp3");
+    gotHitVoice1 = minim.loadFile("gotHit1.mp3");
+    gotHitVoice2 = minim.loadFile("gotHit2.mp3");
+    gotHitVoice3 = minim.loadFile("gotHit3.mp3");
+
     
     leftRunSprites = new PImage[]{
       loadImage("Neku_Run_Left1.png"),
@@ -498,13 +511,19 @@ class Neku {
   }
   
   void attackVoice() {
-    boolean playVoice1 = random(0, 100) < 50;
-    if (playVoice1) {
+    int x = (int)random(0, 133);
+    if (x < 33) {
       attackVoice1.rewind();
       attackVoice1.play();
-    } else {
+    } else if (x < 66) {
       attackVoice2.rewind();
       attackVoice2.play();    
+    } else if (x < 100) {
+      attackVoice3.rewind();
+      attackVoice3.play();
+    } else {
+      attackVoice4.rewind();
+      attackVoice4.play();
     }
   }
   
@@ -516,5 +535,20 @@ class Neku {
   void victoryVoice() {
     victory.rewind();
     victory.play(); 
+  }
+  
+  void gotHitVoice() {
+    float x = random(100);
+   
+    if (x < 33) {
+      gotHitVoice1.rewind();
+      gotHitVoice1.play();
+    } else if (x < 66) {
+      gotHitVoice2.rewind();
+      gotHitVoice2.play();
+    } else {
+      gotHitVoice3.rewind();
+      gotHitVoice3.play();
+    } 
   }
 }
