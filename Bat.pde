@@ -22,6 +22,8 @@ class Bat {
   Minim minim;
   AudioPlayer hitNoise;
   AudioPlayer deathNoise;
+  AudioPlayer spinSound;
+  AudioPlayer hitSound;
   
   Neku enemy;
   
@@ -30,13 +32,19 @@ class Bat {
   
   int shadowDistance;  // The number of pixels the Bat's shadow appears below the bat (decreases when Bat attacks Neku).
   
+  PFont damageFont;
+  boolean damageNumberFallsToTheRight;
+  int damageNum;
+  int damageFrame;
+  int damageNumberX;
+  int damageNumberY;
+  
   final static int SPRITE_WIDTH = 50;
   final static int SPRITE_HEIGHT = 68; 
   final static int NUM_SPRITES_IN_ONE_FLAP = 6;  // The number of sprites in each PImage sprite array.
   final static int NUM_SPRITES_IN_ONE_ATTACK = 4;
   final static int NUM_FRAMES_TO_ATTACK = 100;  // The duration of the bat's movement towards Neku.
-  final static int NUM_HITS_BEFORE_DYING = 7;
-  
+  final static int NUM_HITS_BEFORE_DYING = 8;  
   
   int attackFrame;  // The current frame during the attack (whch will last NUM_FRAMES_TO_ATTACK frames).
   int waitingFrames;  // The amount of time between attacks.
@@ -94,6 +102,14 @@ class Bat {
     slashesThatHit = new ArrayList<Slash>();
     
     deathNoise = minim.loadFile("batDeathNoise.wav");
+    spinSound = minim.loadFile("spin.mp3");
+    hitSound = minim.loadFile("hit.mp3");
+    hitSound.setGain(5);
+    
+    damageFont = createFont("Impact", 18);
+    damageNumberFallsToTheRight = random(100) < 50;
+    damageFrame = 1;
+    damageNum = 1;
   }
   
   void display() {
@@ -102,8 +118,14 @@ class Bat {
     faceEnemy();
     if (isAttacking) {
       attack();
+      if (!spinSound.isPlaying()) {
+        spinSound.loop(); 
+      }
     } else {
       flap();
+      if (spinSound.isPlaying()) {
+        spinSound.pause(); 
+      }
     }
     
     if (yPos >= ScreenSeparator.CENTER_Y_BOTTOM - ScreenSeparator.SCREEN_HEIGHT/2) {
@@ -123,6 +145,10 @@ class Bat {
       isAttacking = false; 
       yPos -= 20;
     }
+    
+    if (damageFrame > 0) {
+      showHitDamage(); 
+    }
   }
   
   void updatePosition() {
@@ -131,6 +157,9 @@ class Bat {
     
     xPos -= deltaX;
     yPos -= deltaY;
+    
+    damageNumberX -= deltaX;
+    damageNumberY -= deltaY;
     
     currentEnemyX = enemy.xPos;
     currentEnemyY = enemy.yPos;
@@ -174,5 +203,37 @@ class Bat {
   
   void die() {
     deathNoise.play(); 
+    spinSound.pause();
+  }
+  
+  void playHitSound() {
+    hitSound.rewind();
+    hitSound.play();
+  }
+  
+  void showHitDamage() {
+    if (damageFrame++ < 40) {
+      damageNumberX += damageNumberFallsToTheRight ? 2 : -2;
+      damageNumberY++; 
+    } else if (damageFrame < 50) {
+      damageNumberX += damageNumberFallsToTheRight ? 1 : -1;
+      damageNumberY ++;
+    } else if (damageFrame < 80) {
+      damageNumberY += 2;
+    } else {
+      return; 
+    }
+    
+    stroke(0);
+    if (damageNum > 25) {
+      fill (229, 45, 59);
+    } else {
+      fill(255, 255, 102);
+    }
+    textFont(damageFont);
+    
+    if (damageNumberY > height/2) {  // Ensure the number isn;t shown on the top screen.
+      text(damageNum, damageNumberX, damageNumberY);
+    }
   }
 }

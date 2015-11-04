@@ -60,7 +60,7 @@ void draw() {
   } else if ((state == BATTLE_STATE) && (battle.numNoiseErased == enemies.size())) {
     if ((restartTransitionFrame++ == 60)) {
       neku.victoryVoice();
-      battle.backgroundMusic.shiftGain(battle.backgroundMusic.getGain(), -50, 2000);
+      battle.backgroundMusic.shiftGain(battle.backgroundMusic.getGain(), -50, 15000);
     } else if (restartTransitionFrame > 240) {
       battle.backgroundMusic.pause();
       battle.backgroundMusic.rewind();
@@ -250,6 +250,8 @@ void updateNekuStatus() {
     }
     
     if (!neku.isHit && b.isAttacking && (dist(b.xPos, b.yPos, neku.xPos, neku.yPos) <= 20)) {
+      b.playHitSound();
+      neku.gotHitVoice();
       neku.isHit = true; 
       neku.fallIndex = 0;
       
@@ -265,6 +267,13 @@ void updateNekuStatus() {
       return;
     } else if (slashAttack != null && dist(slashAttack.x, slashAttack.y, b.xPos, b.yPos) <= Slash.SPRITE_WIDTH) {
       image(slashHitEnemyImage, b.xPos, b.yPos);
+      
+      b.damageNum = (int)random(20, 30);
+      b.damageFrame = 1;
+      b.damageNumberX = (int)b.xPos;
+      b.damageNumberY = (int)b.yPos;
+      b.damageNumberFallsToTheRight = !b.damageNumberFallsToTheRight;  // The damage will alternate beteween falling to the left and to the right.
+      
       if (!b.slashesThatHit.contains(slashAttack)) {
         b.slashesThatHit.add(slashAttack);
         b.hitCounter++;
@@ -283,3 +292,4 @@ void initializeVariables() {
 void resetAudio() {
   
 }
+
