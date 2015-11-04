@@ -268,15 +268,15 @@ void updateNekuStatus() {
     } else if (slashAttack != null && dist(slashAttack.x, slashAttack.y, b.xPos, b.yPos) <= Slash.SPRITE_WIDTH) {
       image(slashHitEnemyImage, b.xPos, b.yPos);
       
-      b.damageNum = (int)random(20, 30);
-      b.damageFrame = 1;
-      b.damageNumberX = (int)b.xPos;
-      b.damageNumberY = (int)b.yPos;
-      b.damageNumberFallsToTheRight = !b.damageNumberFallsToTheRight;  // The damage will alternate beteween falling to the left and to the right.
-      
       if (!b.slashesThatHit.contains(slashAttack)) {
         b.slashesThatHit.add(slashAttack);
         b.hitCounter++;
+        
+        b.damageNum = (int)random(20, 30);
+        b.damageFrame = 1;
+        b.damageNumberX = (int)b.xPos;
+        b.damageNumberY = (int)b.yPos;
+        b.damageNumberFallsToTheRight = !b.damageNumberFallsToTheRight;  // The damage will alternate beteween falling to the left and to the right.
       } 
     }
   } 
