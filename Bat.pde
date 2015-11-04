@@ -212,14 +212,22 @@ class Bat {
   }
   
   void showHitDamage() {
-    if (damageFrame++ < 40) {
+    if (damageFrame++ < 15) {
       damageNumberX += damageNumberFallsToTheRight ? 2 : -2;
       damageNumberY++; 
-    } else if (damageFrame < 50) {
+    } else if (damageFrame < 30) {
       damageNumberX += damageNumberFallsToTheRight ? 1 : -1;
-      damageNumberY ++;
-    } else if (damageFrame < 80) {
+      damageNumberY++;
+    } else if (damageFrame < 45) {
       damageNumberY += 2;
+    } else if (damageFrame < 50) {
+      damageNumberY -= 2; 
+    } else if (damageFrame < 55) {
+      damageNumberY += 2; 
+    } else if (damageFrame < 60) {
+      damageNumberY--;
+    } else if (damageFrame < 65) {
+      damageNumberY++; 
     } else {
       return; 
     }

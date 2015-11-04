@@ -45,7 +45,6 @@ class Neku {
   AudioPlayer attackVoice4;
   AudioPlayer slashSound;
   AudioPlayer victory;
-  AudioPlayer gotHitVoice1;
   AudioPlayer gotHitVoice2;
   AudioPlayer gotHitVoice3;
   AudioPlayer gotHitVoice4;
@@ -88,7 +87,6 @@ class Neku {
     attackVoice4 = minim.loadFile("nekuAttackVoice4.mp3");
     slashSound = minim.loadFile("slashSound.mp3");
     victory = minim.loadFile("victory.mp3");
-    gotHitVoice1 = minim.loadFile("gotHit1.mp3");
     gotHitVoice2 = minim.loadFile("gotHit2.mp3");
     gotHitVoice3 = minim.loadFile("gotHit3.mp3");
 
@@ -540,10 +538,7 @@ class Neku {
   void gotHitVoice() {
     float x = random(100);
    
-    if (x < 33) {
-      gotHitVoice1.rewind();
-      gotHitVoice1.play();
-    } else if (x < 66) {
+    if (x < 50) {
       gotHitVoice2.rewind();
       gotHitVoice2.play();
     } else {
